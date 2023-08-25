@@ -273,7 +273,7 @@ void send_visitSex(uint16_t sex)
 //修改屏幕二维码信息
 void send_QRInfo(uint8_t* data,uint8_t dataLen,uint16_t QR)
 {
-	uint8_t buf[80]={0x00},i;
+	uint8_t buf[200]={0x00},i;
 	short int tmp=0;
 	uint16_t utmp16=0,len;
 	uint16_t crc16;
@@ -558,11 +558,11 @@ Para: data：数据  dataLen：数据长度
 */
 void Send_Text_Content(uint8_t* data,uint8_t dataLen)  
 {
-	uint8_t buf[35]={0x00},i;
+	uint8_t buf[200]={0x00},i;
 	short int tmp=0;
 	uint16_t utmp16=0,len;
 	uint16_t crc16;
-	if(dataLen>46)
+	if(dataLen>200)
 		return;
 	len=6+dataLen+2;
 	memset(buf,0,sizeof(buf));

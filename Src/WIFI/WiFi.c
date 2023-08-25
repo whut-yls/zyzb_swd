@@ -81,6 +81,7 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 					osDelay (200);	
 					atk_8266_send_cmd(bufCon,0xFFFF);
 					HAL_UART_Receive_DMA(&huart3, RecCom3,COM3_REC_MAX);
+					cnt_heartbag = 0;	
 				}
 				if(strstr((const char*)RecCom3,MQTT_CONNECT)){
 					printf("wifi-working\r\n");
@@ -134,7 +135,6 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 							gGlobalData.heart_sendStatus=false;  																												//wifi不发心跳包
 							netData_process(cjdata,sizeof(cjdata));
 							memset(RecCom3,0,sizeof(RecCom3));
-
 							if(gGlobalData.ResetStatus==true)
 							{
 								gGlobalData.ResetStatus=false;
@@ -268,10 +268,11 @@ void wifi_deinit(void)
 	cnt_heartbag = 0;																																														//切wifi时清空心跳计数器
 	osDelay(100);	
 	atk_8266_send_cmd("AT",0xFFFF);
-	osDelay(200);	
+	osDelay(500);	
 	atk_8266_send_cmd("AT+RST",0xFFFF);																																					//设置WIFI STA模式
 	osDelay(3000);
 	atk_8266_send_cmd("AT+WJAP=0,0",0xffff);
+	osDelay(500);	
 //	atk_8266_send_cmd("AT+WMODE=0,0",0xffff);                                                                  //wifi 固件升级后用这句
 	printf("WIFI-Reset-powerdown");	
 	return;

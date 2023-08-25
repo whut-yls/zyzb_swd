@@ -649,7 +649,7 @@ void do_work_ctl(uint8_t workMode)
 				gGlobalData.oldWorkMode=gGlobalData.curWorkMode;
 				gGlobalData.current_treatNums =0;
 				gGlobalData.channelPos =0;
-				HAL_PCA9554_outputAll(0);
+
 				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 				//运行红灯 set灭 reset亮
 				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 					//运行绿灯 set灭 reset亮
 				osDelay(100);

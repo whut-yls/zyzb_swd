@@ -18,6 +18,7 @@
   */
 /* USER CODE END Header */
 
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
@@ -42,7 +43,6 @@
 #include "ad9833.h"
 #include "lcdTask.h"
 #include "dac8831.h"
-#include "crc16.h"
 #include "wifi.h"
 #include "EC20_4G.h"
 #include "timer.h"
@@ -57,6 +57,8 @@ unsigned char RecCom3[COM3_REC_MAX+1];	//pc
 uint16_t 			RecCom3Num=0;
 unsigned char RecCom6[COM6_REC_MAX+1];	//pc
 uint16_t 			RecCom6Num=0;
+
+unsigned char RecCom2[COM2_REC_MAX];	//音频
 uint8_t       RecSen[30];   //接收屏幕返回数据
 uint32_t channelTime = 0;
 bool gUartPcInit=false,gUartPcTc=false;
@@ -450,7 +452,59 @@ int main(void)
 
 }
 
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == USART2){
+		 if(RecCom2[0] == 0x7E && RecCom2[5] == 0xEF){
+			 switch(RecCom2[2]){
+				 case 0xA3:
+					 if(RecCom2[3] == 0x00 && RecCom2[4] == 0xA7)
+						 printf("Play_specified_song:Success\r\n");       
+					 else
+						 printf("Play_specified_song_Error code:%d\r\n",RecCom2[3]);
+					 break;
+				case 0xAA:	 
+					if(RecCom2[3] == 0x00 && RecCom2[4] == 0xAE)
+						printf("Play_Pause:Success\r\n");
+					else
+						printf("Play_Pause_Error code:%d\r\n",RecCom2[3]);
+					break;
+				case 0xAB:	 
+					if(RecCom2[3] == 0x00 && RecCom2[4] == 0xAF)
+						printf("Stop_playing:Success\r\n");
+					else
+						printf("Stop_playing_Error code:%d\r\n",RecCom2[3]);
+					break;
+				case 0xAC:	 
+					if(RecCom2[3] == 0x00 && RecCom2[4] == 0xB0)
+						printf("Next_song:Success\r\n");
+					else
+						printf("Next_song_Error code:%d\r\n",RecCom2[3]);
+					break;
+				case 0xAD:	 
+					if(RecCom2[3] == 0x00 && RecCom2[4] == 0xB1)
+						printf("Previous_song:Success\r\n");
+					else
+						printf("Previous_song_Error code:%d\r\n",RecCom2[3]);
+					break;
+				case 0xAE:	 
+					if(RecCom2[3] == 0x00 && RecCom2[4] == 0xB2)
+						printf("Volume_adjustment:Success\r\n");
+					else
+						printf("Volume_adjustment_Error code:%d\r\n",RecCom2[3]);
+					break;
+				default :
+					 break; 
+			 }
+		 }
+			memset(RecCom2,0,sizeof(RecCom2));
+			HAL_UART_Receive_IT(&huart2, RecCom2,COM2_REC_MAX); 
+	}
+	
+	
+	
+	
+}
 
 /**
   * @brief System Clock Configuration
@@ -1317,7 +1371,7 @@ static void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-
+	HAL_UART_Receive_IT(&huart2, RecCom2,COM2_REC_MAX);
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -1519,7 +1573,7 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);         // 初始化默认拉低 拉高亮灯
-   
+	HAL_GPIO_WritePin(GPIOI, IO13_Pin, GPIO_PIN_RESET);   
 
   
   /*Configure GPIO pin : RS485_EN2_Pin */
@@ -1758,7 +1812,7 @@ void StartDefaultTask(void const * argument)
 									gGlobalData.current_treatNums =0;
 									gGlobalData.channelPos =0;
                   set_sampleMode(MODE_CLOSE);
-									HAL_PCA9554_outputAll(0);
+
 									HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 						//运行红灯 set灭 reset亮
 									HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 							//运行绿灯 set灭 reset亮
 									send_LcdSync(0);
@@ -1872,7 +1926,7 @@ void StartDefaultTask(void const * argument)
 									gGlobalData.current_treatNums =0;
 									gGlobalData.channelPos =0;
 									set_sampleMode(MODE_CLOSE);
-									HAL_PCA9554_outputAll(0);
+
 									HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 						//运行红灯 set灭 reset亮
 									HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 							//运行绿灯 set灭 reset亮
                   gGlobalData.cur_heart_state=LEISURE;
@@ -2044,8 +2098,8 @@ void StartLoopTask(void const * argument)
 {
   /* USER CODE BEGIN StartLoopTask */
   /* Infinite loop */
-	HAL_PCA9554_outputAll(0);
-	HAL_PCA9554_init();
+
+//	HAL_PCA9554_init();
 	
 	startLoopTask(argument);
   /* USER CODE END StartLoopTask */
@@ -2189,7 +2243,7 @@ void Console_Task(void const * pvParameters)
 							gGlobalData.current_treatNums =0;
 							gGlobalData.channelPos =0;
 							//set_sampleMode(MODE_CLOSE);
-							HAL_PCA9554_outputAll(0);
+
 							HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 				//运行红灯 set灭 reset亮
 							HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 					//运行绿灯 set灭 reset亮
 							osDelay(100);

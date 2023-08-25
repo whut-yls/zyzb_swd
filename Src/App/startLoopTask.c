@@ -54,12 +54,13 @@ void startLoopTask(void const * argument)
 	/*开始adc dma循环采集*/
 //	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)gADC1_DMA_BUF,N_NUM* AD1_NUM);
 	
-
+#if 0            //温湿度传感器和采集子板地址冲突先给屏蔽
 	/*气压传感器初始化*/
 	sensor_init();
 	/*电池采集传感器初始化*/
 	/*温湿度传感器初始化*/
 	DataCollectInit();
+#endif
 	while(1)
 	{
 		osDelay(1);
@@ -113,6 +114,7 @@ void startLoopTask(void const * argument)
 			}
 
 		} 
+#if 0            //温湿度传感器和采集子板地址冲突先给屏蔽		
 		/*温度湿度采集*/
 		if(SensorCnt1==0||SensorCnt1>=10)	//3s
 		{
@@ -198,6 +200,7 @@ void startLoopTask(void const * argument)
 			DataCollectExecute();
 		}
 		#endif
+#endif
 		/*电量采集*/
 		/*****/
 		

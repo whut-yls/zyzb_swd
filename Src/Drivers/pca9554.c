@@ -213,7 +213,7 @@ bool set_sampleMode(uint8_t mode)
 			WriteOUT10(GPIO_PIN_SET);
 			WriteOUT11(GPIO_PIN_SET);
 			WriteOUT12(GPIO_PIN_SET);
-			WriteOUT13(GPIO_PIN_SET);
+//			WriteOUT13(GPIO_PIN_SET);      //这个改灯了
 			WriteOUT14(GPIO_PIN_SET);
 		
 			WriteOUT_Mode(GPIO_PIN_RESET);
@@ -231,7 +231,7 @@ bool set_sampleMode(uint8_t mode)
 			WriteOUT10(GPIO_PIN_RESET);
 			WriteOUT11(GPIO_PIN_RESET);
 			WriteOUT12(GPIO_PIN_RESET);
-			WriteOUT13(GPIO_PIN_RESET);
+//			WriteOUT13(GPIO_PIN_RESET);        //这个改灯了
 			WriteOUT14(GPIO_PIN_RESET);
 		
 			WriteOUT_Mode(GPIO_PIN_RESET);
@@ -271,7 +271,7 @@ bool set_sampleMode(uint8_t mode)
 			WriteOUT10(GPIO_PIN_RESET);
 			WriteOUT11(GPIO_PIN_RESET);
 			WriteOUT12(GPIO_PIN_RESET);
-			WriteOUT13(GPIO_PIN_RESET);
+//			WriteOUT13(GPIO_PIN_RESET);    //这个改灯了
 			WriteOUT14(GPIO_PIN_RESET);
 		
 			WriteOUT_Mode(GPIO_PIN_SET);
@@ -289,7 +289,7 @@ bool set_sampleMode(uint8_t mode)
 			WriteOUT10(GPIO_PIN_RESET);
 			WriteOUT11(GPIO_PIN_RESET);
 			WriteOUT12(GPIO_PIN_RESET);
-			WriteOUT13(GPIO_PIN_RESET);
+//			WriteOUT13(GPIO_PIN_RESET);        //这个改灯了
 			WriteOUT14(GPIO_PIN_RESET);
 			WriteOUT_Mode(GPIO_PIN_RESET);
 			break;

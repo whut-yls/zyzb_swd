@@ -445,38 +445,24 @@ void Uart7_IDLE_HandleRec(void)
   */
 void UART7_IRQHandler(void)
 {
-//	if(__HAL_UART_GET_FLAG(&huart7, UART_IT_ORE) != RESET)
-//	{
-//		__HAL_UART_FLUSH_DRREGISTER(&huart7);
-//	}
-//		if(HAL_UART_GetError(&huart7) & HAL_UART_ERROR_ORE)
-//		{
-//			__HAL_UART_FLUSH_DRREGISTER(&huart7);
-//		}
 	/* USER CODE BEGIN UART7_IRQn 0 */
 		if(RESET != __HAL_UART_GET_FLAG(&huart7, UART_FLAG_ORE)||
 			 RESET != __HAL_UART_GET_FLAG(&huart7, UART_FLAG_FE)||
 			 RESET != __HAL_UART_GET_FLAG(&huart7, UART_FLAG_PE)||
 			 RESET != __HAL_UART_GET_FLAG(&huart7, UART_FLAG_NE))
 		   {
-				if(gUartLcdTc==false)  //debug gUartPcTc  把单片机给屏幕发的串口指令导致一直开启dma接收中断给换回lcd对lcd  
-				{
-					gUartLcdInit=true;
-					HAL_UART_DeInit(&huart7);
-					MX_UART7_Init();
-					gUartLcdInit=false; 
-					HAL_UART_Receive_DMA(&huart7, RecCom7,COM7_REC_MAX);
-					__HAL_UART_CLEAR_IDLEFLAG(&huart7);
-					__HAL_UART_ENABLE_IT(&huart7, UART_IT_IDLE);
-					
-					return;	//很重要 一定要返回 特别是fe pe ne 错误
-				}
-//			if(RESET != __HAL_UART_GET_FLAG(&huart7, UART_IT_RXNE))
-//			{
-//				__HAL_UART_CLEAR_IDLEFLAG(&huart7);
-//				__HAL_UART_CLEAR_IT(&huart7, UART_IT_RXNE);
-//				HAL_UART_Receive_DMA(&huart7, RecCom7,COM7_REC_MAX);
-//			}
+					if(gUartLcdTc==false)  //debug gUartPcTc  把单片机给屏幕发的串口指令导致一直开启dma接收中断给换回lcd对lcd  
+					{
+						gUartLcdInit=true;
+						HAL_UART_DeInit(&huart7);
+						MX_UART7_Init();
+						gUartLcdInit=false; 
+						HAL_UART_Receive_DMA(&huart7, RecCom7,COM7_REC_MAX);
+						__HAL_UART_CLEAR_IDLEFLAG(&huart7);
+						__HAL_UART_ENABLE_IT(&huart7, UART_IT_IDLE);
+						
+						return;	//很重要 一定要返回 特别是fe pe ne 错误
+					}
 	      }
   /* USER CODE END UART7_IRQn 0 */
   HAL_UART_IRQHandler(&huart7);
