@@ -625,6 +625,7 @@ void do_work_ctl(uint8_t workMode)
 				send_LcdWorkStatus(5);																			//设备暂停状态
 				osDelay(200);	
 				send_LcdOutStatus(0);//设置输出为红灯 kardos 2023.03.05
+				gGlobalData.Auto_Level_Ctl = 0;  
 			  break;
 		case 3: 
 			  Send_Fix_Ack(100,STATUS_OK,"OK");
@@ -658,6 +659,7 @@ void do_work_ctl(uint8_t workMode)
 				Send_ComMusic(3);
 				send_lcdPage(0);    
 				level=0;//复位时 给0  2023.04.04 kardos
+				gGlobalData.Auto_Level_Ctl = 0;  
 				HAL_TIM_Base_DeInit(&htim12);   //不产生波形
 		  	break;
 		case 4:     //swd档位加

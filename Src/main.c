@@ -1687,7 +1687,7 @@ void StartDefaultTask(void const * argument)
 		uint8_t gbk0[8]={0,};
 	uint8_t gbkNum0[13]={0,};
   /* USER CODE BEGIN 5 */
-
+	int16_t CountDown_Time = 0;
 	/*ADC校准**/
 	if(HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED)!=HAL_OK)
 	{
@@ -1732,6 +1732,7 @@ void StartDefaultTask(void const * argument)
 				gGlobalData.current_treatNums = 0;                               
 				if(gGlobalData.curWorkMode == 1)														//生物电理疗
 				{
+					CountDown_Time = gGlobalData.Alltime;
 					gGlobalData.oldWorkMode = gGlobalData.curWorkMode;
 					gGlobalData.currentUnitNum=0;
 					gGlobalData.channelPos = 0;
@@ -1753,7 +1754,7 @@ void StartDefaultTask(void const * argument)
 				}
 				else																											 //穴位疼痛理疗
 				{
-				
+					CountDown_Time = gGlobalData.Alltime;
 					send_wave_xwtt(gGlobalData.useWorkArg[0].waveTreat);     //发送波形
 					osDelay(200);
 					send_ecA_xwtt(gGlobalData.useWorkArg[0].aPower);         //发送通道A电流
@@ -1773,6 +1774,18 @@ void StartDefaultTask(void const * argument)
 			switch(gGlobalData.curWorkState)
 			{
 				case WORK_START:
+							if(CountDown_Time != gGlobalData.Alltime){
+								CountDown_Time = gGlobalData.Alltime;
+								Countdown_Treat(gGlobalData.Alltime);
+								osDelay(10);
+								if(gGlobalData.Auto_Level_Ctl >= 5 && gGlobalData.Auto_Level_Ctl <= 60 && 
+									gGlobalData.Auto_Level_Ctl != level && gGlobalData.Alltime >= 120){                               //自动加减档位控制
+									gGlobalData.Auto_Level_Ctl > level ? do_work_ctl(4) : do_work_ctl(5);
+								}
+								else if(gGlobalData.Auto_Level_Ctl == level){                                                       //加减控制完后清0重置
+									gGlobalData.Auto_Level_Ctl = 0;
+								}
+							}		
 							if(gGlobalData.channelPos>=gGlobalData.useWorkArg[0].chanelNum-1)																			//是否是最后一个方案
 							{
 							  if((uint32_t)((gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat + 
@@ -1835,7 +1848,8 @@ void StartDefaultTask(void const * argument)
 									osDelay(100);	
 									send_LcdWorkStatus(1);																					//修改设备工作状态为：设备待机状态
 									osDelay(100);	
-									send_lcdPage(0);         																				//返回扫码界面					
+									send_lcdPage(0);         																				//返回扫码界面
+									gGlobalData.Auto_Level_Ctl = 0;  																//归零
 								}
 								else{
 									gGlobalData.channelPos++;
@@ -1852,7 +1866,7 @@ void StartDefaultTask(void const * argument)
 																(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);	
 									osDelay(200);
 									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);
-									Dac8831_Set_Amp(level, ch1buf);
+									Dac8831_Set_Amp(level, ch1buf);  
 									DAC8831_Set_Data_Dma(ch1buf,sizeof(ch1buf)/2,gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat);					//定时器开启产生波形			
 							
 	
@@ -1880,7 +1894,28 @@ void StartDefaultTask(void const * argument)
 			switch(gGlobalData.curWorkState)
 			{
 				case WORK_START:
-				        
+							if(CountDown_Time != gGlobalData.Alltime){                     //倒计时1s进一次
+								CountDown_Time = gGlobalData.Alltime;
+								Countdown_Treat(gGlobalData.Alltime);
+								osDelay(10);
+								if(gGlobalData.channel == 1 && gGlobalData.Auto_Level_Ctl >= 6 && gGlobalData.Auto_Level_Ctl <= 250 && gGlobalData.Alltime >= 120){   //自动加减档位控制                              
+									if(gGlobalData.Auto_Level_Ctl != gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower){
+										gGlobalData.Auto_Level_Ctl > gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower ? do_work_ctl(6) : do_work_ctl(7);
+									}
+									else if(gGlobalData.Auto_Level_Ctl == gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower){                           			//加减控制完后清0重置												
+										gGlobalData.Auto_Level_Ctl = 0;
+									}
+								}
+								else if(gGlobalData.channel == 2 && gGlobalData.Auto_Level_Ctl >= 6 && gGlobalData.Auto_Level_Ctl <= 250 && gGlobalData.Alltime >= 120){                                                       
+									if(gGlobalData.Auto_Level_Ctl != gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower){
+										gGlobalData.Auto_Level_Ctl > gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower ? do_work_ctl(8) : do_work_ctl(9);
+									}
+									else if(gGlobalData.Auto_Level_Ctl == gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower){
+										gGlobalData.Auto_Level_Ctl = 0;
+									}									
+								}
+							}			
+							
 							if(gGlobalData.channelPos>=gGlobalData.useWorkArg[0].chanelNum-1)																			//是否是最后一个方案
 							{
 							  if((uint32_t)((gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat + 
@@ -1938,7 +1973,7 @@ void StartDefaultTask(void const * argument)
 									send_LcdOutStatus(0);                                           //理疗结束红灯
 									osDelay(100);	
 									send_lcdPage(0);      																				  //返回扫码界面	
-								
+									gGlobalData.Auto_Level_Ctl = 0;                                 //归零
 								}
 								else{
 								send_ecA_xwtt(5);
@@ -2216,6 +2251,7 @@ void Console_Task(void const * pvParameters)
 							osDelay(200);	
 							send_LcdOutStatus(0);//设置输出为红灯 kardos 2023.03.05
 							cnt_heartbag = 0;																						//发送心跳清空心跳计数器
+							gGlobalData.Auto_Level_Ctl = 0;  
 							gGlobalData.heartbag_flage = 1;                               
 							break;
 						case 0x03: 																									  //复位
@@ -2254,6 +2290,7 @@ void Console_Task(void const * pvParameters)
 							Send_ComMusic(3);
 							osDelay(100);
 							level=0;//复位时 给0  2023.04.04 kardos
+							gGlobalData.Auto_Level_Ctl = 0;  
 							HAL_TIM_Base_DeInit(&htim12);   //不产生波形
 							break;
 						//SWD  +5

@@ -28,7 +28,7 @@ int Init_All_Parameter(void)
 	gGlobalData.currentNet=NET_RJ45;
 	gGlobalData.ResetStatus=true;
 	gGlobalData.cur_heart_state=UNKNOWN;	
-	
+	gGlobalData.Auto_Level_Ctl = 0;  	
 
 	for(i=0;i<2;i++)
 	{

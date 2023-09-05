@@ -756,9 +756,7 @@ void ethernet_link_thread(void const * argument)
 	gGlobalData.conFlage=2;//初始去连wifi去，如果没有跳变的话
 	gGlobalData.Wifi_set = true;	
 	gGlobalData.netKind = 2;
-	
-	uint16_t count_down=0;
-  uint8_t  buf_Uncon[50];
+
 	/*hgz 默认的网络断开 连接处理会导致系统段错误，并且这个函数默认也并没有被调用，估计没有测试过
 	这里只是用来检测网络的状态，加一段自定义处理 给自己判断网络连接情况**/
 #if 1	//hgz add
@@ -796,11 +794,7 @@ void ethernet_link_thread(void const * argument)
 					HAL_GPIO_WritePin(GPIOC,GPIO_PIN_12,GPIO_PIN_RESET);      //网络灯绿色亮
 				}	
 		}
-		count_down++;
-		if(count_down==10){
-			count_down=0;
-			Countdown_Treat(gGlobalData.Alltime);  // 1s发两次倒计时	
-		}			
+	
 //		if(EthStatusOld!=gEthStatus)
 //		{
 //			EthStatusOld=gEthStatus;
