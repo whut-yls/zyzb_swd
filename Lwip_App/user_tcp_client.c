@@ -1712,7 +1712,7 @@ int netData_process(char *payload,int payloadLen)
 			}
 			else{
 				Send_Fix_Ack(functionFlag,STATUS_FAIL,"key-control-repeatedly err");
-				return -1;
+				break;
 			}
 			item=cJSON_GetObjectItem(root, KEY_VALUE);
 				if (item == NULL || !cJSON_IsNumber(item)) {
@@ -1726,7 +1726,7 @@ int netData_process(char *payload,int payloadLen)
 				gGlobalData.Auto_Level_Ctl = item->valueint/2*2;
 			else{
 				Send_Fix_Ack(functionFlag,STATUS_FAIL,"key-control-value err");
-				return -1;			
+				break;			
 			}
 			Send_Fix_Ack(functionFlag,STATUS_OK,"ok");
 		break;
