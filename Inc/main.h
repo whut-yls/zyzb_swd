@@ -269,7 +269,7 @@ extern uint16_t 			RecCom6Num;
 extern unsigned char RecCom2[COM2_REC_MAX];
 extern uint8_t       RecSen[30];   //接收屏幕返回数据
 
-extern uint8_t level;
+extern float level;
 extern SemaphoreHandle_t		ConsoleReceive_Semaphore; 
 extern SemaphoreHandle_t		lcdSemaphore;
 extern bool gUartPcInit,gUartPcTc;

@@ -666,38 +666,44 @@ void do_work_ctl(uint8_t workMode)
 
 			if(level <= 60)
 			{
-				level+=1;
+				for(int level_CD = 0 ; level_CD < 10 ; level_CD++){								
+					if(level*1000 - (int)level*1000 <= 1)
+						level = ((level + 0.1f)*1000+0.1f)/1000 ;
+					else
+						level += 0.1;								
+					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+					Dac8831_Set_Amp(level, ch1buf);//幅值改变		
+					Dac_level_CTL(1);   //档位改变后波形产生
+					osDelay(1);										
+				}	
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 							level,
 							(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-				osDelay(200);
-				if(level <= 60)
-				{
-					Send_LcdVoltage(5.84*level);//适用于低功率放大板子
-				}
-				Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-				Dac8831_Set_Amp(level, ch1buf);//幅值改变				
+				osDelay(100);
+				Send_LcdVoltage(5.84*level);//适用于低功率放大板子		
 			}	
-			Dac_level_CTL(1);   //档位改变后波形产生
 			break;
 						
 		case 5:    //SWD档位减
 
 			if(level >= 5)
 			{
-				level-=1;
+				for(int level_ACD = 0 ; level_ACD < 10 ; level_ACD++){
+					if(level*1000 - (int)level*1000 <= 1)
+						level = ((level - 0.1f)*1000+0.1f)/1000 ;
+					else
+						level -= 0.1;
+					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+					Dac8831_Set_Amp(level, ch1buf);//幅值改变	
+					Dac_level_CTL(1);   //档位改变后波形产生	
+					osDelay(1);
+				} 
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-				osDelay(200);
-				if(level <= 60)
-				{
-					Send_LcdVoltage(5.84*level);//适用于低功率放大板子
-				}
-				Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-				Dac8831_Set_Amp(level, ch1buf);//幅值改变																			
-			} 
-			Dac_level_CTL(1);   //档位改变后波形产生			
+				osDelay(100);
+				Send_LcdVoltage(5.84*level);//适用于低功率放大板子			
+			}		
 			break;
 		//A通道  +5
 		case 6:
@@ -801,7 +807,7 @@ void general_heartBag(int fun, int status, int netKind, int workState, int timeL
 	cJSON_AddNumberToObject(item_env,KEY_HUMID,gSensorData1.RH);
 
 	item_para = cJSON_AddObjectToObject(root,KEY_PARA);
-	cJSON_AddNumberToObject(item_para ,KEY_LEVEL, level);
+	cJSON_AddNumberToObject(item_para ,KEY_LEVEL, (char)level);
 	cJSON_AddNumberToObject(item_para,KEY_APOWER,gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower);
     cJSON_AddNumberToObject(item_para,KEY_BPOWER,gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
 	//cJSON_AddStringToObject(root,KEY_UPD_FLAGE,"SWD");

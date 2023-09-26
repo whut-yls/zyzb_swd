@@ -172,7 +172,7 @@ void Wave_select(uint8_t n, uint16_t *_pBuf)
 	}
 }
 
-void Dac8831_Set_Amp(uint16_t amp, uint16_t *_pBuf)
+void Dac8831_Set_Amp(float amp, uint16_t *_pBuf)
 {
 	int buf_data;
 	for(int i = 0; i < 100; ++i)

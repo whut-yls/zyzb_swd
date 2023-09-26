@@ -1801,9 +1801,9 @@ void StartMqttSendTask(void const *arg)
 				osDelay(100);
 				atk_8266_send_cmd((char*)bufwifi_ack_head,strlen(bufwifi_ack_head));
 				osDelay(50);
-				taskENTER_CRITICAL();				
+				__disable_irq();				
 				HAL_UART_Transmit_DMA(&huart3,(char*)messageSend.payload,messageSend.payloadlen);
-				taskEXIT_CRITICAL();
+				__enable_irq();
 //				HAL_UART_Transmit_DMA(&huart3,(char*)gAck,strlen(gAck));			
 				osDelay(10);						
 				
@@ -1836,7 +1836,9 @@ void StartMqttSendTask(void const *arg)
 				osDelay(50);
 				atk_8266_send_cmd((char*)bufwifi_ack_head,strlen(bufwifi_ack_head));
 				osDelay(50);
+				__disable_irq();
 				HAL_UART_Transmit_DMA(&huart3,(char*)gAck,strlen(gAck));
+				__enable_irq();
 				osDelay(10);
 
 			}

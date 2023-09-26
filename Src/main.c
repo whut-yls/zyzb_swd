@@ -198,7 +198,7 @@ static int cnt_down = 0;		//屏幕倒计时
  static int Resetcnt = 0;
 bool clear_time = false;
 
-uint8_t level=0;//档位强度控制变量
+float level=0;//档位强度控制变量
 
 //软件定时器回调函数
 static void vAutoLoadTimerFunc( TimerHandle_t xTimer )
@@ -1779,10 +1779,10 @@ void StartDefaultTask(void const * argument)
 								Countdown_Treat(gGlobalData.Alltime);
 								osDelay(10);
 								if(gGlobalData.Auto_Level_Ctl >= 5 && gGlobalData.Auto_Level_Ctl <= 60 && 
-									gGlobalData.Auto_Level_Ctl != level && gGlobalData.Alltime >= 120){                               //自动加减档位控制
-									gGlobalData.Auto_Level_Ctl > level ? do_work_ctl(4) : do_work_ctl(5);
+									gGlobalData.Auto_Level_Ctl != (uint8_t)level && gGlobalData.Alltime >= 120){                               //自动加减档位控制
+									gGlobalData.Auto_Level_Ctl > (uint8_t)level ? do_work_ctl(4) : do_work_ctl(5);
 								}
-								else if(gGlobalData.Auto_Level_Ctl == level){                                                       //加减控制完后清0重置
+								else if(gGlobalData.Auto_Level_Ctl == (uint8_t)level){                                                       //加减控制完后清0重置
 									gGlobalData.Auto_Level_Ctl = 0;
 								}
 							}		
@@ -1790,24 +1790,12 @@ void StartDefaultTask(void const * argument)
 							{
 							  if((uint32_t)((gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat + 
 									gGlobalData.useWorkArg[gGlobalData.current_treatNums].waitTime)*1000-channelTime)<=120000)				//说明是最后120秒 开始降低档位
-								{
-									if(channelTime-countTime>=4000&&level>10){
-									 level-=1;
-								  	Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);						//波形选择
-										Dac8831_Set_Amp(level, ch1buf);						//赋值改变
-										
-										DAC8831_Set_Data_Dma(ch1buf,sizeof(ch1buf)/2,gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat);					//定时器开启产生波形
-										
-										countTime=channelTime;
-										send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
-										level,
-										(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);												//修改屏幕显示的治疗方案
-										osDelay(100);
-										if(level <= 60)
-//											Send_LcdVoltage(5.513*level);	//发送显示电压 适用于高功率版本
-											Send_LcdVoltage(5.84*level);	
+									{
+										if(channelTime-countTime>=4000 && (uint8_t)level>10){
+											do_work_ctl(5);
+											countTime=channelTime;
+										}
 									}
-								}
 							}
 
 							//判断治疗时间是否到，且不是最后一个通道，切换下一通道,并更新通道位置、重置包位置计数、时间计数
@@ -1935,8 +1923,8 @@ void StartDefaultTask(void const * argument)
 										{
 											gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower-=2;
 											send_ecB_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
-												osDelay(200);	
-										send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
+											osDelay(200);	
+											send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
 																		gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower,
 																	(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60,
 																		gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
@@ -2298,42 +2286,46 @@ void Console_Task(void const * pvParameters)
 
 							if(level <= 60)
 							{
-								level+=1;
+								for(int level_cd = 0 ; level_cd < 10 ; level_cd++){								
+									if(level*1000 - (int)level*1000 <= 1)
+										level = ((level + 0.1f)*1000+0.1f)/1000 ;
+									else
+										level += 0.1;								
+									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+									Dac8831_Set_Amp(level, ch1buf);//幅值改变		
+									Dac_level_CTL(1);   //档位改变后波形产生
+									osDelay(10);										
+								}		
 								send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-								osDelay(200);
-								if(level <= 60)
-								{
-									Send_LcdVoltage(5.84*level);//适用于低功率放大板子
-								}
-								
-								Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-								Dac8831_Set_Amp(level, ch1buf);//幅值改变				
-							}		
-							Dac_level_CTL(1);   //档位改变后波形产生
+								osDelay(100);
+								Send_LcdVoltage(5.84*level);//适用于低功率放大板子
+							}
 							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;																						//发送心跳清空心跳计数器
-              gGlobalData.heartbag_flage = 1;                             
+							gGlobalData.heartbag_flage = 1;                             
 							break;
 						//SWD  -5
 						case 0x0c:
-
 							if(level >= 5)
 							{
-								level-=1;
-								send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
-														level,
-														(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-							  osDelay(200);
-								if(level <= 60)
-								{
-									Send_LcdVoltage(5.84*level);//适用于低功率放大板子
+								for(int level_acd = 0 ; level_acd < 10 ; level_acd++){
+									if(level*1000 - (int)level*1000 <= 1)
+										level = ((level - 0.1f)*1000+0.1f)/1000 ;
+									else
+										level -= 0.1;								
+									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+									Dac8831_Set_Amp(level, ch1buf);//幅值改变			
+									Dac_level_CTL(1);   //档位改变后波形产生		
+									osDelay(10);										
 								}
-								Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-								Dac8831_Set_Amp(level, ch1buf);//幅值改变																			
+								send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
+													level,
+													(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
+								osDelay(100);
+								Send_LcdVoltage(5.84*level);//适用于低功率放大板子	
 							}
-							Dac_level_CTL(1);   //档位改变后波形产生
 							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;															//发送心跳清空心跳计数器
 							gGlobalData.heartbag_flage = 1;                            
