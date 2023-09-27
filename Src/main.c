@@ -48,6 +48,7 @@
 #include "timer.h"
 #include "Wt2003hx.h"
 #include "dac8831.h"
+#include "crc16.h"
 SemaphoreHandle_t					ConsoleReceive_Semaphore=NULL; 
 SemaphoreHandle_t  	lcdSemaphore = NULL;
 unsigned char RecCom7[COM7_REC_MAX+1];	//pc
@@ -373,7 +374,7 @@ int main(void)
 	osDelay(20);
 	Send_LcdDevid_id(gDeviceParam.devId);  //发送设备id到屏幕显示
 	osDelay(20);
-	sprintf(version,"%s",gDeviceParam.version);
+	sprintf((char*)version,"%s",gDeviceParam.version);
 	Send_LcdVersion(version,strlen((const char*)version));	 //发送版本号到屏幕显示 
 	osDelay(20);
 	Send_Text_SetButton(0,0);	//文本框按键默认不可用
@@ -1698,7 +1699,6 @@ void StartDefaultTask(void const * argument)
 	{
 		Error_Handler();
 	}
-
 	osDelay(10);	
 	
 	/*开始DMA接收ADC，DMA满产生中断*/
@@ -1750,7 +1750,7 @@ void StartDefaultTask(void const * argument)
 					osDelay(100);
 					if(level <= 60)
 					//	Send_LcdVoltage(5.513*level);	//发送显示电压 适用于高功率版本
-							Send_LcdVoltage(5.84*level);	
+							Send_LcdVoltage(5.84f*level);	
 				}
 				else																											 //穴位疼痛理疗
 				{
@@ -1859,7 +1859,7 @@ void StartDefaultTask(void const * argument)
 							
 	
 //								Send_LcdVoltage(5.513*level);	//适用于高功率版本
-									Send_LcdVoltage(5.84*level);	//适用于低功率版本
+									Send_LcdVoltage(5.84f*level);	//适用于低功率版本
 									osDelay(200);	
 									channelTime=0;
 
@@ -2193,7 +2193,7 @@ void Console_Task(void const * pvParameters)
 								 set_sampleMode(MODE_ZL);
 								if(level <= 60)
 								{
-								 Send_LcdVoltage(5.84*level);//适用于低功率放大板子
+								 Send_LcdVoltage(5.84f*level);//适用于低功率放大板子
 								}
 								else 
 									Send_LcdVoltage(5.84*60);	
@@ -2290,7 +2290,7 @@ void Console_Task(void const * pvParameters)
 									if(level*1000 - (int)level*1000 <= 1)
 										level = ((level + 0.1f)*1000+0.1f)/1000 ;
 									else
-										level += 0.1;								
+										level += 0.1f;								
 									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
 									Dac8831_Set_Amp(level, ch1buf);//幅值改变		
 									Dac_level_CTL(1);   //档位改变后波形产生
@@ -2300,7 +2300,7 @@ void Console_Task(void const * pvParameters)
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 								osDelay(100);
-								Send_LcdVoltage(5.84*level);//适用于低功率放大板子
+								Send_LcdVoltage(5.84f*level);//适用于低功率放大板子
 							}
 							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;																						//发送心跳清空心跳计数器
@@ -2314,7 +2314,7 @@ void Console_Task(void const * pvParameters)
 									if(level*1000 - (int)level*1000 <= 1)
 										level = ((level - 0.1f)*1000+0.1f)/1000 ;
 									else
-										level -= 0.1;								
+										level -= 0.1f;								
 									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
 									Dac8831_Set_Amp(level, ch1buf);//幅值改变			
 									Dac_level_CTL(1);   //档位改变后波形产生		
@@ -2324,7 +2324,7 @@ void Console_Task(void const * pvParameters)
 													level,
 													(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 								osDelay(100);
-								Send_LcdVoltage(5.84*level);//适用于低功率放大板子	
+								Send_LcdVoltage(5.84f*level);//适用于低功率放大板子	
 							}
 							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;															//发送心跳清空心跳计数器

@@ -350,7 +350,7 @@ void MakeSawtoothTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBottom,
 void MakeExponentTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBottom, uint16_t _usTop)
 {
 	uint16_t i;
-	uint16_t change = _usSamples / 2;
+//	uint16_t change = _usSamples / 2;
 	uint16_t att = _usTop - _usBottom;
 	for (i = 0; i < _usSamples; i++)
 	{
@@ -510,3 +510,5 @@ void MakeContinuityTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBotto
 {
 	MakeDenseTable(_pBuf,_usSamples,_usBottom, _usTop);
 }
+
+

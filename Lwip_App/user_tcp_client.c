@@ -22,7 +22,7 @@ struct netconn*  gNetSock[NET_SOCK_NUM];
 unsigned char gNetSockStatus[NET_SOCK_NUM];
 //static char gRecvNetData[RECV_BUF_MAX-1];
 //char gSendNetData[RECV_BUF_MAX-1];
-static unsigned char gRecvCheckData[100];
+//static unsigned char gRecvCheckData[100];
 
 
 int netData_process(char *payload,int payloadLen);
@@ -363,12 +363,12 @@ unsigned portBASE_TYPE StartMqttClientTask_stack;
 void StartMqttClientTask(void const *arg)		//记得增加栈空间尺寸 否则可能导致溢出
 {
 
-	char rc;
-	unsigned short payloadLen=0;
+	int rc;
+//	unsigned short payloadLen=0;
 
-	unsigned char addr[4]={0,};
-	int ret;	//char ret 无法表示-1=0xff
-	int len;
+//	unsigned char addr[4]={0,};
+//	int ret;	//char ret 无法表示-1=0xff
+//	int len;
 	unsigned char buf[60]={0,};
 	
 	MQTTMessage messageSend;
@@ -413,9 +413,9 @@ void StartMqttClientTask(void const *arg)		//记得增加栈空间尺寸 否则可能导致溢出
 			gGlobalData.ResetStatus=false;
 			do_work_ctl(3);
 			osDelay(100);//kardos 2023.03.30
-			send_QRInfo(gDeviceParam.qrbuf_SWD,strlen(gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
+			send_QRInfo(gDeviceParam.qrbuf_SWD,strlen((const char*)gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
 			osDelay(100);//kardos 2023.03.30
-			send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen(gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
+			send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen((const char*)gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
 	}
 		cnt_heartbag = 0;												//发送心跳清空心跳计数器		
 		gGlobalData.heartbag_flage=1;			      //连接上服务器立马发送心跳并接收解析   
@@ -455,9 +455,9 @@ void StartMqttClientTask(void const *arg)		//记得增加栈空间尺寸 否则可能导致溢出
 						gGlobalData.ResetStatus=false;
 						do_work_ctl(3);
 						osDelay(100);//kardos 2023.03.30
-						send_QRInfo(gDeviceParam.qrbuf_SWD,strlen(gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
+						send_QRInfo(gDeviceParam.qrbuf_SWD,strlen((const char*)gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
 						osDelay(100);//kardos 2023.03.30
-						send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen(gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
+						send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen((const char*)gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
 						osDelay(100);//kardos 2023.03.30
 					}
 					send_NetSync(1);  																																		  //网络灯 1601  //**//
@@ -466,8 +466,7 @@ void StartMqttClientTask(void const *arg)		//记得增加栈空间尺寸 否则可能导致溢出
 					cnt_heartbag = 0;																																			 //发送心跳清空心跳计数器	
 					gGlobalData.heartbag_flage=1;			      																						   //连接上服务器立马发送心跳并接收解析				
 				}
-			}
-				
+			}			
 			//接收消息测试		
 			rc=MQTTSubscribe_RecvMessage(&messageRecv,&messageTopic);
 
@@ -510,9 +509,9 @@ int netData_process(char *payload,int payloadLen)
 
 	uint8_t intIp[4]={0,},intMask[4]={0,},intGate[4]={0,},intMac[12]={0,};
 	bool ipTrue=false,maskTrue=false,gateTrue=false,macTrue=false;
-	int tCollectFreq,tCollectUptime;
+	int tCollectFreq = 0;																				//tCollectUptime;
 	int tDataStartFlag,tDataStartFlag2;
-	int  functionFlag,directionFlag,valueFlag,unityFlag,motorFlag,motorMode;
+	int  functionFlag,valueFlag;														//	directionFlag,unityFlag,motorFlag,motorMode;
 	cJSON *root = NULL, *item = NULL,*itemSub=NULL;
 	cJSON *cjsonArr=NULL,*cjsonArr2=NULL,*arryItem=NULL;
 	/*接收解析 到有会话id和功能就回复*/
@@ -575,8 +574,8 @@ int netData_process(char *payload,int payloadLen)
 	cJSON_Delete(root);
 		return -1;
 	}
-	strcpy(gGlobalData.ack_time ,item->valuestring);
-	GBK_Timeprocess(gGlobalData.ack_time );		
+	strcpy((char*)gGlobalData.ack_time ,item->valuestring);
+	GBK_Timeprocess((char*)gGlobalData.ack_time );		
 	
 	/*根据功能解析其它参数*/
 	switch(functionFlag)
@@ -1137,7 +1136,7 @@ int netData_process(char *payload,int payloadLen)
 		tDataStartFlag2=item->valueint;
 //		gGlobalData.curWorkState=tDataStartFlag2;
 		
-		if(tDataStartFlag2!=WORK_START&&tDataStartFlag2!=WORK_PAUSE&&tDataStartFlag2!=WORK_STOP)
+		if(tDataStartFlag2 != WORK_START && tDataStartFlag2 != WORK_PAUSE && tDataStartFlag2 != WORK_STOP)
 		{	
 			Send_Fix_Ack(functionFlag,STATUS_FAIL,"key-value err");
 		}else if(tDataStartFlag2 == WORK_STOP){              //复位自己发ack
@@ -1415,7 +1414,7 @@ int netData_process(char *payload,int payloadLen)
 		osDelay(50);
 		GBK_Msgprocess(gUserInfo.name);    //发送指令至屏幕显示下发数据的名字
 		osDelay(50);
-		send_visitNumber(gUserInfo.number);          //发送指令至屏幕显示编号
+		send_visitNumber((uint8_t *)gUserInfo.number);          //发送指令至屏幕显示编号
 		osDelay(50);
 		send_visitSex(reet);       //发送指令至屏幕显示下发数据的性别
 		osDelay(50);
@@ -1569,7 +1568,7 @@ int netData_process(char *payload,int payloadLen)
 			}
 			memset(strBuf,0,sizeof(strBuf));
 			strcpy(strBuf,item->valuestring);
-			SendMessageDialog(strBuf,strlen(strBuf));                    //处理提示框
+			SendMessageDialog((uint8_t *)strBuf,strlen(strBuf));                    //处理提示框
 			Send_Fix_Ack(functionFlag,STATUS_OK,"ok");
 		break; 
 			
@@ -1581,8 +1580,8 @@ int netData_process(char *payload,int payloadLen)
 				return -1;
 			}
 			memset(strBuf,0,sizeof(strBuf));
-			strcpy(strBuf,item->valuestring);
-			Send_PlayMusic(strBuf);
+			strcpy((char*)strBuf,item->valuestring);
+			Send_PlayMusic((uint8_t *)strBuf);
 			Send_Fix_Ack(functionFlag,STATUS_OK,"ok");
 		break;  
 			
@@ -1619,10 +1618,10 @@ int netData_process(char *payload,int payloadLen)
 			}
 			valueFlag=item->valueint;
 			if(valueFlag){
-					WriteOUT13(0);
+					WriteOUT13(GPIO_PIN_RESET);
 			}
 			else{
-					WriteOUT13(1);    // 亮灯
+					WriteOUT13(GPIO_PIN_SET);    // 亮灯
 			}  
 			Send_Fix_Ack(functionFlag,STATUS_OK,"ok");
 		break;
@@ -1751,10 +1750,9 @@ unsigned portBASE_TYPE StartMqttSendTask_stack;
 void StartMqttSendTask(void const *arg)
 {
 	int len;
-	int rb=0;
+//	int rb=0;
 	unsigned char buf[20]={0,};
 	char buf4g_ack_head[128]={0,},bufwifi_ack_head[128]={0,};			//wifi&4g应答头
-	uint16_t mqCount=0;//mq心跳计数器
 	MQTTMessage messageSend;
 
 	//发布消息初始化
@@ -1772,8 +1770,7 @@ void StartMqttSendTask(void const *arg)
 		if(gGlobalData.heartbag_flage == 1)
 		{
 			gGlobalData.heartbag_flage =0;
-			Send_heartBag(FUN_JIANCHE_DATA,STATUS_OK,gGlobalData.netKind,gGlobalData.cur_heart_state,gGlobalData.Alltime);
-			
+			Send_heartBag(FUN_JIANCHE_DATA,STATUS_OK,gGlobalData.netKind,gGlobalData.cur_heart_state,gGlobalData.Alltime);	
 		}	
 					//hyadd 发送心跳包
 		if(gGlobalData.Send_Heart_Bag==true)
@@ -1784,8 +1781,7 @@ void StartMqttSendTask(void const *arg)
 			if(gGlobalData.rj45Status==true)
 			{
 				MQTTPublish(gTopicInfo.cmdPost, &messageSend);
-			}
-				
+			}		
 		}
 		//wifi向服务器发送心跳
 		else if(gGlobalData.Send_Heart_Bag_wifi){
@@ -1795,14 +1791,13 @@ void StartMqttSendTask(void const *arg)
 			messageSend.payload=gAck;
 			taskEXIT_CRITICAL();
 			if(gGlobalData.wifiStatus)        													//wifi应答
-			{
-				
+			{		
 				sprintf(bufwifi_ack_head,"AT+MQTTPUBRAW=\"%s\",1,0,%d",gTopicInfo.cmdPost,messageSend.payloadlen);  //wifi应答头
 				osDelay(100);
-				atk_8266_send_cmd((char*)bufwifi_ack_head,strlen(bufwifi_ack_head));
+				atk_8266_send_cmd((uint8_t*)bufwifi_ack_head,strlen(bufwifi_ack_head));
 				osDelay(50);
 				__disable_irq();				
-				HAL_UART_Transmit_DMA(&huart3,(char*)messageSend.payload,messageSend.payloadlen);
+				HAL_UART_Transmit_DMA(&huart3,(uint8_t*)messageSend.payload,messageSend.payloadlen);
 				__enable_irq();
 //				HAL_UART_Transmit_DMA(&huart3,(char*)gAck,strlen(gAck));			
 				osDelay(10);						
@@ -1813,7 +1808,6 @@ void StartMqttSendTask(void const *arg)
 		//发送采集到的数据 如：经络检测数据
 		if(gGlobalData.Send_Data_Task==true)
 		{
-
 			messageSend.payload =gGlobalData.PlusePressDataSend;                                 //gGlobalData.PlusePressDataSend;
 			messageSend.payloadlen =gGlobalData.PlusePressDataLen;                                     //gGlobalData.PlusePressDataLen;
 			MQTTPublish(gTopicInfo.streamPost, &messageSend);
@@ -1834,38 +1828,30 @@ void StartMqttSendTask(void const *arg)
 			{	
 				sprintf(bufwifi_ack_head,"AT+MQTTPUBRAW=\"%s\",1,0,%d",gTopicInfo.cmdPost,messageSend.payloadlen);  //wifi应答头				
 				osDelay(50);
-				atk_8266_send_cmd((char*)bufwifi_ack_head,strlen(bufwifi_ack_head));
+				atk_8266_send_cmd((uint8_t*)bufwifi_ack_head,strlen(bufwifi_ack_head));
 				osDelay(50);
 				__disable_irq();
-				HAL_UART_Transmit_DMA(&huart3,(char*)gAck,strlen(gAck));
+				HAL_UART_Transmit_DMA(&huart3,(uint8_t*)gAck,strlen(gAck));
 				__enable_irq();
 				osDelay(10);
 
 			}
 			else if(gGlobalData.yd4gStatus==true&&gGlobalData.netKind==3)																																		//4g应答
 			{
-
 				sprintf(buf4g_ack_head,"AT+QMTPUBEX=0,0,0,0,\"%s\",%d\r\n",gTopicInfo.cmdPost,messageSend.payloadlen);//4g应答头				
 				osDelay(10);
-				HAL_UART_Transmit_DMA(&huart6,(char*)buf4g_ack_head,strlen(buf4g_ack_head));
+				HAL_UART_Transmit_DMA(&huart6,(uint8_t*)buf4g_ack_head,strlen(buf4g_ack_head));
 				osDelay (50);
-				HAL_UART_Transmit_DMA(&huart6,(char*)gAck,strlen(gAck));
+				HAL_UART_Transmit_DMA(&huart6,(uint8_t*)gAck,strlen(gAck));
 				osDelay(10);
-
-
-
 			}	
 			gGlobalData.Send_Ack_Task=false;
-
-		}
-		
+		}	
 		if(gGlobalData.Send_Update_Task==true)
 		{
-
 			gGlobalData.Send_Update_Task=false;
 //			memset(gSendNetData,0,sizeof(gSendNetData));	
 		}
-
 		//温湿度采集认为开启时 下面方法有效
  		if(gGlobalData.Send_Ping_Task==true)
 		{
@@ -1875,9 +1861,7 @@ void StartMqttSendTask(void const *arg)
 //				printf("PINGREQ Send errno\r\n");
 			}
 			gGlobalData.Send_Ping_Task=false;
-		}
-
-		
+		}		
 	}
 }
 
@@ -1931,7 +1915,7 @@ void GBK_Msgprocess(char*buf)
 			ret=strtol(twobuf,&pend,16);
 			if(ret==0)
 			{
-					c=9;
+				c=9;
 //					gbk16[k]='\0';
 				send_visitName(gbk0,8);
 				osDelay(10);
@@ -1940,8 +1924,8 @@ void GBK_Msgprocess(char*buf)
 			}
 			else
 			{
-			gbk16[k++]=ret;
-			memset (twobuf,0,sizeof(twobuf));
+				gbk16[k++]=ret;
+				memset (twobuf,0,sizeof(twobuf));
 			}	
 	}
 	return;
@@ -1967,9 +1951,7 @@ void GBK_Timeprocess(char *buf)
 		ret=strtol(twobuf,&pend,10);
     buf6[k++]=ret;
 		memset (twobuf,0,sizeof(twobuf));
-
-	}
-	
+	}	
 	send_rtcTime(buf6[0],buf6[1],buf6[2],buf6[3],buf6[4],buf6[5]);
 	return;
 }
@@ -1988,27 +1970,26 @@ void Countdown_Treat(uint16_t count)
 //处理消息提示框
 void SendMessageDialog(uint8_t *Msg,uint8_t Msglen)
 {
-	int c,i,j=0,k=0;
+	int c,i,k=0;
 	long ret;
 	char *pend;
-	char twobuf[2];    
-	char Recbuf[200],Msgbuf[200];
+	uint8_t twobuf[2];    
+	uint8_t Msgbuf[200];
 	memset(Msgbuf,0,sizeof(Msgbuf));
-	strcpy(Recbuf,Msg);
     
 	for(c=0;c<Msglen/2;c++)
 	{
 	 for(i=0;i<2;i++)
 		{
-	    twobuf[i]=Recbuf[j++];
+	    twobuf[i]= *Msg++;  
 		}
-		ret=strtol(twobuf,&pend,16);
+		ret=strtol((const char*)twobuf,&pend,16);
 		Msgbuf[k++]=ret;
 		memset (twobuf,0,sizeof(twobuf));
 	}
 	Send_Text_Box(1);
 	osDelay(50);
-	Send_Text_Content(Msgbuf,strlen(Msgbuf));
+	Send_Text_Content(Msgbuf,strlen((const char*)Msgbuf));
 	osDelay(50);
 	Send_Text_SetButton(0,1);
 	osDelay(50);
@@ -2026,18 +2007,18 @@ void SendleftQR(char *buf,char QR_locatoin){
 	char Recbuf[200];
 	strcpy(Recbuf,buf);
 
-	for(c=0;c<strlen(Recbuf)/2;c++)
+	for(c=0;c<strlen(buf)/2;c++)
 	{
-	   for(i=0;i<2;i++)
+	  for(i=0;i<2;i++)
 		{
 	    twobuf[i]=Recbuf[j++];
-        }
+    }
 		ret=strtol(twobuf,&pend,16);
 		if(QR_locatoin==0){
-            gDeviceParam.qrbuf_SWD[k++]=ret;
+      gDeviceParam.qrbuf_SWD[k++]=ret;
 		}
 		else if(QR_locatoin==1){
-		gDeviceParam.qrbuf_XWTT[k++]=ret;
+			gDeviceParam.qrbuf_XWTT[k++]=ret;
 		}
 		memset (twobuf,0,sizeof(twobuf));
 	}
@@ -2047,22 +2028,10 @@ void SendleftQR(char *buf,char QR_locatoin){
 
 /*线程：心跳包端口检测*/
 void StartSendheartTask(void const *arg)
-{
-	char bufwifi_ack_head[128]={0,};				//配置为接收模式
-	MQTTMessage messageSend;
-
-	//发布消息初始化
-	messageSend.dup = 0;
-	messageSend.qos = QOS0;
-	messageSend.retained = 0;
-	messageSend.payload =NULL;//gSendNetData;
-	messageSend.payloadlen = 0;//strlen(gSendNetData);
-	
+{	
 	while(1)
 	{
 
-	
-	
 	}
 	
 

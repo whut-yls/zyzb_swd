@@ -139,7 +139,7 @@ void EC200MqttClientTask(void const * argument)	//EC20配置初始化，连接MQTT服务器
 			nums++;
 			if(nums>200&&gGlobalData.yd4gStatus==true&&cjdata==NULL){      //cjdata==NULL在处理解析的时候就不会发自身心跳影响解析
 				nums=0;
-				HAL_UART_Transmit_DMA(&huart6,aTxBuffer13,strlen(aTxBuffer13));				//"AT+QMTRECV: 0,0\r\n" 配置为接收模式    心跳包
+				HAL_UART_Transmit_DMA(&huart6,aTxBuffer13,sizeof(aTxBuffer13));				//"AT+QMTRECV: 0,0\r\n" 配置为接收模式    心跳包
 				osDelay(200);
 
 			}
@@ -158,9 +158,9 @@ void EC200MqttClientTask(void const * argument)	//EC20配置初始化，连接MQTT服务器
 				{
 					sprintf(buf4g_ack_head,"AT+QMTPUBEX=0,0,0,0,\"%s\",%d\r\n",gTopicInfo.cmdPost,messageSend.payloadlen);//4g应答头
 					osDelay(10);
-					HAL_UART_Transmit_DMA(&huart6,(char*)buf4g_ack_head,strlen(buf4g_ack_head));
+					HAL_UART_Transmit_DMA(&huart6,(uint8_t*)buf4g_ack_head,strlen(buf4g_ack_head));
 					osDelay (50);
-					HAL_UART_Transmit_DMA(&huart6,(char*)gAck,strlen(gAck));
+					HAL_UART_Transmit_DMA(&huart6,(uint8_t*)gAck,strlen(gAck));
 					osDelay(10);	
 				}	
 			}
@@ -201,9 +201,9 @@ void EC200MqttClientTask(void const * argument)	//EC20配置初始化，连接MQTT服务器
 									gGlobalData.ResetStatus=false;
 									do_work_ctl(3);
 									osDelay(100);//kardos 2023.03.30
-									send_QRInfo(gDeviceParam.qrbuf_SWD,strlen(gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
+									send_QRInfo(gDeviceParam.qrbuf_SWD,strlen((const char*)gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
 									osDelay(100);//kardos 2023.03.30
-									send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen(gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
+									send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen((const char*)gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
 								}		
 								send_NetSync(5);    //网络灯 1601  
 								osDelay (100);	

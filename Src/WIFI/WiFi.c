@@ -27,7 +27,7 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 //	strcpy((char*)gDeviceParam.wifiArg.WifiPwd,"12345678");
 	//bool gGlobal_WifiChange=true;
 
-	uint8_t buf_MQ_User[50],buf_MQ_pw[50],bufsub[50],bufssid[50],bufServer[50],bufport[50],bufway[50],bufMqid[50],bufCon[50],buf_Uncon[50];
+	uint8_t buf_MQ_User[50],buf_MQ_pw[50],bufsub[50],bufssid[50],bufServer[50],bufport[50],bufway[50],bufMqid[50],bufCon[50];
 
 	while(1)
 	{
@@ -103,7 +103,7 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 
 		
 		//网络状态正常  且为wifi连接的情况下 才去解析服务器发送过来的数据
-		if(gGlobalData.isConnect==1&&gGlobalData.wifiStatus ==true&&gGlobalData.netKind==2){
+		if(gGlobalData.isConnect==1&& gGlobalData.wifiStatus == true && gGlobalData.netKind==2){
 		/*数据接受解析处理*/  	
 		if((cjdata=strstr((const char*)RecCom3,MQTT_DATA_REC))!=0 ){
 			 osDelay(10);
@@ -141,9 +141,9 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 								do_work_ctl(3);
 								osDelay (100);                        
 								osDelay(100);//kardos 2023.03.30
-								send_QRInfo(gDeviceParam.qrbuf_SWD,strlen(gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
+								send_QRInfo(gDeviceParam.qrbuf_SWD,strlen((const char*)gDeviceParam.qrbuf_SWD),QR_CODE_ADD);   				//发送生物电二维码到屏幕左侧显示
 								osDelay(100);//kardos 2023.03.30
-								send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen(gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
+								send_QRInfo(gDeviceParam.qrbuf_XWTT,strlen((const char*)gDeviceParam.qrbuf_XWTT),QR_CODE_ADD_RIGHT);   //发送穴位疼痛二维码到屏幕右侧上显示
 								}
 							send_NetSync(3);   																																					 //网络灯 wifi正常 
 
@@ -244,7 +244,7 @@ void WifiMqttClientTask(void const * argument)        //void StartDefaultTask(vo
 void atk_8266_send_cmd(uint8_t *cmd,uint16_t waittime)
 {
 	sprintf(rec_cmd,"%s\r\n",cmd);	//发送命令
-	HAL_UART_Transmit_Wifi(rec_cmd,strlen(rec_cmd),0xffff);
+	HAL_UART_Transmit_Wifi((uint8_t *)rec_cmd,strlen((const char *)rec_cmd),0xffff);
 
 	return;
 } 

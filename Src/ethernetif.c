@@ -751,7 +751,6 @@ void ethernet_link_thread(void const * argument)
   ETH_MACConfigTypeDef MACConf;
   uint32_t PHYLinkState;
   uint32_t linkchanged = 0, speed = 0, duplex =0;
-	bool EthStatusOld=false;
 	bool isNetState=false;
 	gGlobalData.conFlage=2;//初始去连wifi去，如果没有跳变的话
 	gGlobalData.Wifi_set = true;	
@@ -794,13 +793,6 @@ void ethernet_link_thread(void const * argument)
 					HAL_GPIO_WritePin(GPIOC,GPIO_PIN_12,GPIO_PIN_RESET);      //网络灯绿色亮
 				}	
 		}
-	
-//		if(EthStatusOld!=gEthStatus)
-//		{
-//			EthStatusOld=gEthStatus;
-////			gSendEthChange=true;
-//			gRecvEthChange=true;  //debug
-//		}
 		osDelay(50);
 	}
 #endif 
@@ -862,7 +854,6 @@ void ethernet_link_thread(void const * argument)
 //  netif_set_up(netif);
 //  netif_set_link_up(netif);
 #endif //hgz
-  osDelay(100);
 
 
 /* USER CODE BEGIN ETH link code for User BSP */ 

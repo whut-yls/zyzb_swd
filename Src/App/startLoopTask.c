@@ -34,8 +34,8 @@ void startLoopTask(void const * argument)
 	/*led 计数	按键计数*/
 	uint16_t ledCnt=0,pingCnt=0;
 	/*温湿度相关定义*/
-	uint8_t temp[8]={0x00};
-	uint32_t t1,f1;
+//	uint8_t temp[8]={0x00};
+//	uint32_t t1,f1;
 	uint8_t SensorCnt1=0,SensorCnt2=0;
 	uint8_t Key_input=0;	
 	/*adc校正--f4无adc校准*/

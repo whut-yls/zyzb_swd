@@ -394,7 +394,7 @@ exit:
 **/
  int MQTTSubscribe_RecvMessage( MQTTMessage* message,MQTTString*messageTopic)
  {
-	 	static int ackCount=0;
+
 		int rc=MQ_FAILURE;
 		uint16_t len,l= 0;
 
@@ -406,8 +406,8 @@ exit:
 		unsigned char retained;
 		unsigned short msgid;
 		int payloadlen_in;
-		char buufferr[10000];  //debug
-//		unsigned char* payload_in=buuffer;	 
+
+ 
 	 
 		unsigned char* payload_in=NULL;
 		MQTTString* receivedTopic=messageTopic;

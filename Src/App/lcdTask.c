@@ -19,8 +19,8 @@ unsigned char ccRecCom3[100];
 void send_lcdPage(uint16_t pageNum)
 {
 	uint8_t buf[20]={0x00};
-	short int tmp=0;
-	uint16_t utmp16=0,len,crc16;
+
+	uint16_t utmp16=0,len;
 	len=10;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -45,9 +45,9 @@ void send_lcdPage(uint16_t pageNum)
 void send_rtcTime(uint8_t year,uint8_t month,uint8_t day,uint8_t hour,uint8_t minute,uint8_t sec)
 {
 	uint8_t buf[20]={0x00};
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	len=14;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -76,9 +76,9 @@ void send_rtcTime(uint8_t year,uint8_t month,uint8_t day,uint8_t hour,uint8_t mi
 void send_countDown(uint8_t hour,uint8_t minute,uint8_t sec)
 {
 	uint8_t buf[20]={0x00};
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	len=10;             //长度要为偶数才行，奇数的buf补0
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -102,9 +102,9 @@ void send_countDown(uint8_t hour,uint8_t minute,uint8_t sec)
 void send_treatSel(uint16_t freq,uint16_t geat,uint16_t time)
 {
 	uint8_t buf[20]={0x00};
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	len=12;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -135,9 +135,9 @@ void send_treatSel(uint16_t freq,uint16_t geat,uint16_t time)
 void send_treatSel_Xwtt(uint16_t wave,uint16_t aPower,uint16_t time,uint16_t bPower)
 {
 	uint8_t buf[20]={0x00};
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	len=14;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -171,9 +171,9 @@ void send_treatSel_Xwtt(uint16_t wave,uint16_t aPower,uint16_t time,uint16_t bPo
 void send_visitNumber(uint8_t* data)
 {
 	uint8_t buf[25]={0x00},i;
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	len=20;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header[0];
@@ -197,9 +197,9 @@ void send_visitName(uint8_t* data,uint8_t dataLen)
 {
 //	uint8_t data1[6]={0xd0,0xdc,0xd7,0xd3,0xd1,0xf4};
 	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	if(dataLen>NAME_LEN_MAX)
 		return;
 	
@@ -224,10 +224,10 @@ void send_visitName(uint8_t* data,uint8_t dataLen)
 //修改屏幕就诊人年龄
 void send_visitAge(uint8_t age)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -248,10 +248,10 @@ void send_visitAge(uint8_t age)
 //修改屏幕就诊人性别
 void send_visitSex(uint16_t sex)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -274,9 +274,9 @@ void send_visitSex(uint16_t sex)
 void send_QRInfo(uint8_t* data,uint8_t dataLen,uint16_t QR)
 {
 	uint8_t buf[200]={0x00},i;
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	if(dataLen>NAME_QR_LEN_MAX)
 		return;
 	
@@ -305,10 +305,10 @@ void send_QRInfo(uint8_t* data,uint8_t dataLen,uint16_t QR)
 //修改屏幕运行状态
 void send_LcdSync(uint8_t status)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -329,10 +329,10 @@ void send_LcdSync(uint8_t status)
 //修改屏幕工作状态 
 void send_LcdWorkStatus(uint8_t status)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -358,10 +358,10 @@ void send_LcdWorkStatus(uint8_t status)
 */
 void send_NetSync(uint8_t status)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -383,10 +383,10 @@ void send_NetSync(uint8_t status)
 //修改屏幕启动状态图片
 void send_StartPic(uint8_t status)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -407,10 +407,10 @@ void send_StartPic(uint8_t status)
 //断网提示
 void send_duan_wang(uint8_t duan)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -430,10 +430,10 @@ void send_duan_wang(uint8_t duan)
 
 void send_LcdOutStatus(uint8_t status)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -453,10 +453,10 @@ void send_LcdOutStatus(uint8_t status)
 
 void Send_LcdVoltage(uint16_t voltage)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -476,10 +476,10 @@ void Send_LcdVoltage(uint16_t voltage)
 //设备id到屏幕显示 以后可能要加长要改 by yls 2023/5/24
 void Send_LcdDevid_id(int32_t Devid)
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=10;
 	memset(buf,0,sizeof(buf));
@@ -502,9 +502,9 @@ void Send_LcdDevid_id(int32_t Devid)
 void Send_LcdVersion(uint8_t* version,uint8_t versionLen)
 {
 	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
+
 	
 	len=8+versionLen+1;
 	memset(buf,0,sizeof(buf));
@@ -531,10 +531,8 @@ Para: 0:隐藏 1:打开
 */
 void Send_Text_Box(uint8_t state)  
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
 	
 	len=8;
 	memset(buf,0,sizeof(buf));
@@ -559,9 +557,7 @@ Para: data：数据  dataLen：数据长度
 void Send_Text_Content(uint8_t* data,uint8_t dataLen)  
 {
 	uint8_t buf[200]={0x00},i;
-	short int tmp=0;
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
 	if(dataLen>200)
 		return;
 	len=6+dataLen+2;
@@ -591,10 +587,8 @@ Para: page：页码  state：可不可用->0:不可用  1：可用
 
 void Send_Text_SetButton(uint8_t page,uint8_t state)  
 {
-	uint8_t buf[35]={0x00},i;
-	short int tmp=0;
+	uint8_t buf[35]={0x00};
 	uint16_t utmp16=0,len;
-	uint16_t crc16;
 
 	len=14;
 	memset(buf,0,sizeof(buf));
@@ -622,6 +616,7 @@ void Send_Text_SetButton(uint8_t page,uint8_t state)
 	HAL_UART_Transmit_Lcd(buf,len,0xFFFF);	
 }
 
+/*
 //屏幕控制处理 
 void page_ctl_process(uint8_t ctlNum)
 {
@@ -644,16 +639,16 @@ void page_ctl_process(uint8_t ctlNum)
 				hexBuf[i]=strBuf[i];												//0~9 gbk=ascii
 			}
 			break;
-		defatul:
-		break;
+		default:
+			break;
 	}
 }
 
 //lcd串口数据处理
+
 void LcdData_Handle(uint8_t *src,uint16_t len)
 {
 	uint16_t	addr;
-	uint16_t utmp16;
 	uint8_t utmp8;
 
 	
@@ -679,6 +674,7 @@ void LcdData_Handle(uint8_t *src,uint16_t len)
 	
 	return ;
 }
+*/
 
 bool lcdTask_Semaphore_Init(void)
 {
@@ -694,28 +690,9 @@ bool lcdTask_Semaphore_Init(void)
 
 void Lcd_Task(void const * argument)
 {	
-	/*
-	HAL_UART_Receive_DMA(&huart3, RecCom3,COM3_REC_MAX);
-
-	__HAL_UART_CLEAR_IDLEFLAG(&huart3);
-	__HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
-	*/   // debug
 	while(1)
 	{
-//		printf("\r\n  com3=%s\r\n",RecCom3);	
-//		sprintf(ccRecCom3,"\r\ncom=%s\r\n",RecCom3);
-//		HAL_UART_Transmit(&huart3, ccRecCom3, sizeof(ccRecCom3), 500);
-//		HAL_Delay(3000);
-/*		xSemaphoreTake(lcdSemaphore,portMAX_DELAY);
-	
 
-		LcdData_Handle(RecCom3,RecCom3Num);
-		
-		READ_REG(huart3.Instance->RDR);		
-		
-		SET_BIT(huart3.Instance->CR1, USART_CR1_RE);
-		HAL_UART_Receive_DMA(&huart3, RecCom3, COM3_REC_MAX);
-*/  //debug
 	}//while
   /* USER CODE END 5 */ 
 }

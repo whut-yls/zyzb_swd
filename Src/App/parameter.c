@@ -94,7 +94,7 @@ int Init_Parameter(void)
 			}
 
 			//检测参数-输出档位
-			if(gDeviceParam.workArg[i].level>Level_MAX||gDeviceParam.workArg[i].upTime<Level_MIN)
+			if(gDeviceParam.workArg[i].level>Level_MAX || gDeviceParam.workArg[i].upTime<Level_MIN)
 			{
 				gDeviceParam.workArg[i].level=DefLevel;
 			}
@@ -185,7 +185,7 @@ int Init_Parameter(void)
 
 int Restore_Default_Parameter(void)
 {
-	int i,j;
+	int i;
   uint8_t qrbuf_SWD_Default[50] = {0x79,0x73,0x74,0x6a,0x6c,0x79,0x2d,0x73,0x77,0x64,0x2d,0x32,0x30,0x30,0x30,0x30,0x31,0x2d,0x32,0x30,0x30,0x30,0x30,0x31,0x2d};  			 //屏幕左侧SWD二维码
   uint8_t qrbuf_XWTT_Default[50] = {0x79,0x73,0x74,0x6a,0x6c,0x79,0x2d,0x78,0x77,0x74,0x74,0x2d,0x32,0x30,0x30,0x30,0x30,0x31,0x2d,0x32,0x30,0x30,0x30,0x30,0x31,0x2d};   //屏幕右侧XWTT二维码
 	//设备参数
@@ -295,11 +295,11 @@ int Restore_Default_Parameter(void)
 	memset (gDeviceParam.qrbuf_XWTT,0,sizeof (gDeviceParam.qrbuf_XWTT));
 		
 	//屏幕两侧二维码
-	for(i=0;i<strlen(qrbuf_SWD_Default);i++)
+	for(i=0;i<strlen((const char *)qrbuf_SWD_Default);i++)
 	{
 		gDeviceParam.qrbuf_SWD[i]=qrbuf_SWD_Default[i];  		//SWD二维码
 	}
-	for(i=0;i<strlen(qrbuf_XWTT_Default);i++)
+	for(i=0;i<strlen((const char *)qrbuf_XWTT_Default);i++)
 	{
 		gDeviceParam.qrbuf_XWTT[i]=qrbuf_XWTT_Default[i];   //XWTT二维码
 	}	

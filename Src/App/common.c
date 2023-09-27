@@ -17,7 +17,7 @@
 #include "dac8831.h"
 #include "lcdTask.h"
 #include "timer.h"
-
+#include "Wt2003hx.h"
 
 /**
 xSemaphoreTake(xSemaphore, portMAX_DELAY);//pdTRUE/pdFALSE(timeout)
@@ -25,8 +25,8 @@ xSemaphoreGive(xSemaphore);
 pdMS_TO_TICKS(10000);	ms转换成滴答型时间
 mutex 型信号量不能用于中断中
 **/
-static char gPressPluseCnt=0;
-static char gGasPluseCnt=0;
+//static char gPressPluseCnt=0;
+//static char gGasPluseCnt=0;
 
 char gAck[JSON_ACK_MAX_LEN]={0,};
 
@@ -272,7 +272,7 @@ void general_SysCheck_Ack(int fun,int status,char*msg)
 void general_JianChe_Ack(int fun,int status,char*msg)
 {
 	cJSON *root=NULL;
-	cJSON *item_obj = NULL,*item_work=NULL,*item_env=NULL;;//数组对象
+	cJSON *item_obj = NULL,*item_work=NULL,*item_env=NULL;//数组对象
 	static char *jp;
 	int jsonLen;
 	char buf[36];
@@ -572,8 +572,6 @@ int SendPlusePressData(void)
 //工作模式控制
 void do_work_ctl(uint8_t workMode)
 {
-  uint8_t gbk0[8]={0,};
-	uint8_t gbkNum0[13]={0,};
 	switch(workMode){
 		case 1: 
 				if(gGlobalData.curWorkMode==1){
@@ -583,7 +581,7 @@ void do_work_ctl(uint8_t workMode)
 						set_sampleMode(MODE_ZL);
 						if(level <= 60)
 						{
-								Send_LcdVoltage(3.125*level);//适用于低功率放大板子
+								Send_LcdVoltage(3.125f*level);//适用于低功率放大板子
 						}
 						else 
 						Send_LcdVoltage(3.125*60);	
@@ -670,7 +668,7 @@ void do_work_ctl(uint8_t workMode)
 					if(level*1000 - (int)level*1000 <= 1)
 						level = ((level + 0.1f)*1000+0.1f)/1000 ;
 					else
-						level += 0.1;								
+						level += 0.1f;								
 					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
 					Dac8831_Set_Amp(level, ch1buf);//幅值改变		
 					Dac_level_CTL(1);   //档位改变后波形产生
@@ -680,7 +678,7 @@ void do_work_ctl(uint8_t workMode)
 							level,
 							(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 				osDelay(100);
-				Send_LcdVoltage(5.84*level);//适用于低功率放大板子		
+				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子		
 			}	
 			break;
 						
@@ -692,7 +690,7 @@ void do_work_ctl(uint8_t workMode)
 					if(level*1000 - (int)level*1000 <= 1)
 						level = ((level - 0.1f)*1000+0.1f)/1000 ;
 					else
-						level -= 0.1;
+						level -= 0.1f;
 					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
 					Dac8831_Set_Amp(level, ch1buf);//幅值改变	
 					Dac_level_CTL(1);   //档位改变后波形产生	
@@ -702,7 +700,7 @@ void do_work_ctl(uint8_t workMode)
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 				osDelay(100);
-				Send_LcdVoltage(5.84*level);//适用于低功率放大板子			
+				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子			
 			}		
 			break;
 		//A通道  +5
@@ -792,7 +790,7 @@ void general_heartBag(int fun, int status, int netKind, int workState, int timeL
 	cJSON_AddNumberToObject(root,"HeartBag",NULL);			
 	cJSON_AddNumberToObject(root,KEY_DEV_ID,gDeviceParam.devId);		
 	cJSON_AddNumberToObject(root,KEY_SESSION,gGlobalData.sessionId);
-	cJSON_AddStringToObject(root,KEY_TIME,gGlobalData.ack_time);
+	cJSON_AddStringToObject(root,KEY_TIME,(const char *)gGlobalData.ack_time);
 	cJSON_AddNumberToObject(root,KEY_FUN,fun);
 	cJSON_AddStringToObject(root,KEY_Flage,"SWD");
     
@@ -803,7 +801,7 @@ void general_heartBag(int fun, int status, int netKind, int workState, int timeL
 	cJSON_AddNumberToObject(item_work ,KEY__WORK_CURRENT, gGlobalData.currentNet);
 	
 	item_env = cJSON_AddObjectToObject(root,KEY_ENV);
-	cJSON_AddNumberToObject(item_env ,KEY_TEMP, (int) (gSensorData1.RHt*100+0.5)/100.0);
+	cJSON_AddNumberToObject(item_env ,KEY_TEMP, (int) (gSensorData1.RHt*100+0.5f)/100.0);
 	cJSON_AddNumberToObject(item_env,KEY_HUMID,gSensorData1.RH);
 
 	item_para = cJSON_AddObjectToObject(root,KEY_PARA);
