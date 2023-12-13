@@ -259,6 +259,10 @@ extern uint16_t gREFVOL_VAL;
 #define COM7_REC_MAX	 256
 #define COM3_REC_MAX	 256*5		 //wifi串口接收 cjsondata
 #define COM6_REC_MAX	 256*8     //4g串口接收 cjsondata
+
+#define DEBUG_RXBUFFERSIZE 12  	//DEBUG UART4 TYPEC
+extern unsigned char DEBUG_aRxBuffer[DEBUG_RXBUFFERSIZE];
+
 extern unsigned char RecCom7[COM7_REC_MAX+1];	//pc
 //extern uint16_t RecCom7[COM7_REC_MAX+1];	//pc
 extern uint16_t 			RecCom7Num;

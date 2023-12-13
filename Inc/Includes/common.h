@@ -24,6 +24,16 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 #define	HIGH		1
 #define LOW			0
+
+#define Lcd_Button_to_Start    						1
+#define Lcd_Button_to_Pause    						2
+#define Lcd_Button_to_Reset    						3
+#define Lcd_Button_to_Level_Up_SWD 				4
+#define Lcd_Button_to_Level_Down_SWD    	5
+#define Lcd_Button_to_Level_Up_XWTT_A 		6
+#define Lcd_Button_to_Level_Down_XWTT_A   7
+#define Lcd_Button_to_Level_Up_XWTT_B 		8
+#define Lcd_Button_to_Level_Down_XWTT_B   9
 /* USER CODE END Includes */
 /* Private defines ------------------------------*/
 

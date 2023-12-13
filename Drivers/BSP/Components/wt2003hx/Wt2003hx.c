@@ -11,7 +11,7 @@ const uint8_t header_Song[1]={0x7E};
 void Send_PlayMusic(uint8_t *file)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0,i;
 	len=7;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -32,7 +32,7 @@ void Send_PlayMusic(uint8_t *file)
 	buf[7]=crc16;    
 	buf[8]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);		
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);		
 }	
 
 
@@ -48,7 +48,7 @@ void Send_PlayMusic(uint8_t *file)
 void Send_ComMusic(uint8_t com)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -75,7 +75,7 @@ void Send_ComMusic(uint8_t com)
 	buf[3]=crc16;
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 
 }
 
@@ -83,7 +83,7 @@ void Send_ComMusic(uint8_t com)
 void Send_ComVolume(uint8_t size)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0;
+	uint16_t len,crc16=0;
 	len=4;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -96,7 +96,7 @@ void Send_ComVolume(uint8_t size)
 	buf[4]=crc16;
 	buf[5]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 
 }
 
@@ -110,7 +110,7 @@ void Send_ComVolume(uint8_t size)
 void Send_ComMode(uint8_t mode)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0;
+	uint16_t len,crc16=0;
 	len=4;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -124,7 +124,7 @@ void Send_ComMode(uint8_t mode)
 
 	buf[5]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 
 }
 
@@ -159,7 +159,7 @@ void Send_Combination_play(uint8_t length,uint16_t *mode)
 	buf[j++]=crc16;
 	buf[j++]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 
 }
 
@@ -191,7 +191,7 @@ void Send_Insert_PMusic(uint16_t position)
 	buf[5]=crc16;
 	buf[6]=0xEF;
 	
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 	
 //·¢ËÍÒôÆµÊä³ö·½Ê½ÇÐ»»
@@ -201,7 +201,7 @@ void Send_Insert_PMusic(uint16_t position)
 void Send_Output_Change(uint8_t mode)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=4;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -217,7 +217,7 @@ void Send_Output_Change(uint8_t mode)
 	buf[5]=0xEF;
 
 	
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 
@@ -233,7 +233,7 @@ void Send_Output_Change(uint8_t mode)
 void Send_Goto_Low_Power(uint8_t mode)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=4;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -248,7 +248,7 @@ void Send_Goto_Low_Power(uint8_t mode)
 
 	buf[5]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 
@@ -262,7 +262,7 @@ WTC220326-150-A20V4.00 £¬¡±WTC¡±£º¹«Ë¾´úÖ¸£¬¡±220326¡±£º2022 Äê03 ÔÂ26 ÈÕÓÐ·¢²¼Ò
 void Send_Current_Version(void)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -276,7 +276,7 @@ void Send_Current_Version(void)
 
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 
@@ -284,7 +284,7 @@ void Send_Current_Version(void)
 void Send_Current_Volume(void)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -298,7 +298,7 @@ void Send_Current_Volume(void)
 
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 
@@ -313,7 +313,7 @@ void Send_Current_Volume(void)
 void Send_Current_Status(void)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -327,14 +327,14 @@ void Send_Current_Status(void)
 
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 //²éÑ¯µ±Ç°ÒôÀÖÎÄ¼þ×ÜÊý
 void Send_Number_Song(void)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -348,7 +348,7 @@ void Send_Number_Song(void)
 
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 
@@ -356,7 +356,7 @@ void Send_Number_Song(void)
 void Send_Number_Address(void)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0;
 	len=3;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -370,7 +370,7 @@ void Send_Number_Address(void)
 
 	buf[4]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 //²¨ÌØÂÊÇÐ»»
@@ -381,7 +381,7 @@ void Send_Number_Address(void)
 void Send_Change_Baud(uint8_t *parameter)
 {
 	uint8_t buf[20]={0x00},tmp;
-	uint16_t utmp16=0,len,crc16=0,i;
+	uint16_t len,crc16=0,i;
 	len=6;
 	memset(buf,0,sizeof(buf));
 	buf[0]=header_Song[0];
@@ -402,7 +402,7 @@ void Send_Change_Baud(uint8_t *parameter)
 	buf[6]=crc16;
 	buf[7]=0xEF;
 
-	HAL_UART_Transmit(&huart2,buf,strlen(buf),0xFFFF);	
+	HAL_UART_Transmit(&huart2,buf,strlen((const char *)buf),0xFFFF);	
 }
 
 

@@ -573,48 +573,48 @@ int SendPlusePressData(void)
 void do_work_ctl(uint8_t workMode)
 {
 	switch(workMode){
-		case 1: 
-				if(gGlobalData.curWorkMode==1){
-						
-						//如果是生物电理疗 再次开启的时候将电压值显示最新的值
-				if(gGlobalData.curWorkState==WORK_PAUSE)
-						set_sampleMode(MODE_ZL);
-						if(level <= 60)
-						{
-								Send_LcdVoltage(3.125f*level);//适用于低功率放大板子
-						}
-						else 
+		case Lcd_Button_to_Start:
+			if(gGlobalData.curWorkState != WORK_START){
+				if(gGlobalData.curWorkMode == 1){										//如果是生物电理疗 再次开启的时候将电压值显示最新的值			
+					set_sampleMode(MODE_ZL);
+					if(level <= 60)
+					{
+						Send_LcdVoltage(3.125f*level);									//适用于低功率放大板子
+					}
+					else 
 						Send_LcdVoltage(3.125*60);	
 				}
-				if(gGlobalData.curWorkMode==2){															//疼痛理疗 		//2023.02.21 kardos
-						send_startORstop_xwtt(1);																	//启动指令
+				else if(gGlobalData.curWorkMode == 2){															//疼痛理疗 		//2023.02.21 kardos
+					send_startORstop_xwtt(1);																				//启动指令
+					osDelay(200);
+					if(gGlobalData.curWorkState == WORK_PAUSE){//2023.02.24 kardos  先设置波形 再设置ab两个通道的电流值
+						send_wave_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat); //发送波形
 						osDelay(200);
-						if(gGlobalData.curWorkState==WORK_PAUSE){//2023.02.24 kardos  先设置波形 再设置ab两个通道的电流值
-								send_wave_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat); //发送波形
-								osDelay(200);
-								send_ecA_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower);
-								osDelay(200);
-								send_ecB_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
-								osDelay(200);
-						}
+						send_ecA_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower);
+						osDelay(200);
+						send_ecB_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
+						osDelay(200);
+					}
 				}
-				gGlobalData.cur_heart_state=WORKING;
-				gGlobalData.curWorkState=WORK_START;
-				osDelay(20);
+				gGlobalData.cur_heart_state = WORKING;
+				gGlobalData.curWorkState = WORK_START;
+				osDelay(50);
 				send_LcdSync(1); 																						//屏幕运行灯绿灯
-				osDelay(200);
+				osDelay(50);
 				send_LcdWorkStatus(3);																			//穴位理疗中   
-				osDelay(200);	
-				send_LcdOutStatus(1);//设置输出为绿灯 kardos 2023.03.05	 
-				break;
-		case 2:
-				gGlobalData.cur_heart_state=PAUSE;
-				gGlobalData.curWorkState=WORK_PAUSE;
-				if(gGlobalData.curWorkMode==2){		//2023.02.21 kardos
-						send_startORstop_xwtt(0);
+				osDelay(50);	
+				send_LcdOutStatus(1);//设置输出为绿灯 kardos 2023.03.05
+			}				
+			break;
+		case Lcd_Button_to_Pause:
+			if(gGlobalData.curWorkState == WORK_START){
+				gGlobalData.cur_heart_state = PAUSE;
+				gGlobalData.curWorkState = WORK_PAUSE;
+				if(gGlobalData.curWorkMode == 2){		//2023.02.21 kardos
+					send_startORstop_xwtt(0);
 				}
-				if(gGlobalData.curWorkMode==1){	//如果是生物电理疗 暂停时电压给0V
-						Send_LcdVoltage(0);
+				else if(gGlobalData.curWorkMode == 1){	//如果是生物电理疗 暂停时电压给0V
+					Send_LcdVoltage(0);
 				}
 				osDelay(20);					
 				send_LcdSync(0);  
@@ -623,79 +623,65 @@ void do_work_ctl(uint8_t workMode)
 				send_LcdWorkStatus(5);																			//设备暂停状态
 				osDelay(200);	
 				send_LcdOutStatus(0);//设置输出为红灯 kardos 2023.03.05
-				gGlobalData.Auto_Level_Ctl = 0;  
-			  break;
-		case 3: 
-			  Send_Fix_Ack(100,STATUS_OK,"OK");
-				gGlobalData.cur_heart_state=LEISURE;
-				gGlobalData.curWorkState=WORK_STOP; 
-				gGlobalData.Alltime=0;
-				if(gGlobalData.oldWorkMode==1){
-						send_treatSel(0,0,0);   																  //swd治疗方案全置成0
-						Send_LcdVoltage(0);//电压值设置为0
-				}
-				if(gGlobalData.oldWorkMode==2){															//疼痛理疗
-						send_startORstop_xwtt(0);
-						osDelay(100);
-						send_treatSel_Xwtt(0,0,0,0);  
-				}
-				osDelay(100);	
-				send_LcdOutStatus(0);//设置输出为红灯 kardos 2023.03.05
-				osDelay(100);
-				send_LcdSync(0);  					
-				set_sampleMode(MODE_CLOSE);																	//设置模式
-				gGlobalData.curWorkMode=WORK_MODE_WT;
-				gGlobalData.oldWorkMode=gGlobalData.curWorkMode;
-				gGlobalData.current_treatNums =0;
-				gGlobalData.channelPos =0;
-
-				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 				//运行红灯 set灭 reset亮
-				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 					//运行绿灯 set灭 reset亮
-				osDelay(100);
-				send_LcdWorkStatus(1);																			//设备待机状态       
-				osDelay(100);
-				Send_ComMusic(3);
-				send_lcdPage(0);    
-				level=0;//复位时 给0  2023.04.04 kardos
-				gGlobalData.Auto_Level_Ctl = 0;  
-				HAL_TIM_Base_DeInit(&htim12);   //不产生波形
-		  	break;
-		case 4:     //swd档位加
-
+				gGlobalData.Auto_Level_Ctl = 0;  			  
+			}
+			break;
+		case Lcd_Button_to_Reset: 
+			Send_Fix_Ack(100,STATUS_OK,"OK");
+			gGlobalData.cur_heart_state = LEISURE;
+			gGlobalData.curWorkState = WORK_STOP; 
+			gGlobalData.Alltime = 0;
+			if(gGlobalData.oldWorkMode == 1){
+					send_treatSel(0,0,0);   																  //swd治疗方案全置成0
+					Send_LcdVoltage(0);//电压值设置为0
+			}
+			else if(gGlobalData.oldWorkMode == 2){															//疼痛理疗
+					send_startORstop_xwtt(0);
+					osDelay(100);
+					send_treatSel_Xwtt(0,0,0,0);  
+			}
+			osDelay(100);	
+			send_LcdOutStatus(0);//设置输出为红灯 kardos 2023.03.05
+			osDelay(100);
+			send_LcdSync(0);  					
+			set_sampleMode(MODE_CLOSE);																	//设置模式
+			gGlobalData.curWorkMode = WORK_MODE_WT;
+			gGlobalData.oldWorkMode = gGlobalData.curWorkMode;
+			gGlobalData.current_treatNums = 0;
+			gGlobalData.channelPos = 0;
+			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,GPIO_PIN_RESET); 				//运行红灯 set灭 reset亮
+			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET); 					//运行绿灯 set灭 reset亮
+			osDelay(50);
+			send_LcdWorkStatus(1);																			//设备待机状态       
+			osDelay(50);
+			Send_ComMusic(3);
+			osDelay(50);
+			send_lcdPage(0);    
+			level=0;//复位时 给0  2023.04.04 kardos
+			gGlobalData.Auto_Level_Ctl = 0;  
+			HAL_TIM_Base_DeInit(&htim12);   //不产生波形
+			break;
+		case Lcd_Button_to_Level_Up_SWD:     //swd档位加
 			if(level <= 60)
 			{
-				for(int level_CD = 0 ; level_CD < 10 ; level_CD++){								
-					if(level*1000 - (int)level*1000 <= 1)
-						level = ((level + 0.1f)*1000+0.1f)/1000 ;
-					else
-						level += 0.1f;								
-					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-					Dac8831_Set_Amp(level, ch1buf);//幅值改变		
-					Dac_level_CTL(1);   //档位改变后波形产生
-					osDelay(1);										
-				}	
+				level += 1;								
+				Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+				Dac8831_Set_Amp(level, ch1buf);//幅值改变		
+				osDelay(1);													
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 							level,
 							(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 				osDelay(100);
 				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子		
 			}	
-			break;
-						
-		case 5:    //SWD档位减
-
+			break;						
+		case Lcd_Button_to_Level_Down_SWD:    //SWD档位减
 			if(level >= 5)
 			{
-				for(int level_ACD = 0 ; level_ACD < 10 ; level_ACD++){
-					if(level*1000 - (int)level*1000 <= 1)
-						level = ((level - 0.1f)*1000+0.1f)/1000 ;
-					else
-						level -= 0.1f;
-					Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
-					Dac8831_Set_Amp(level, ch1buf);//幅值改变	
-					Dac_level_CTL(1);   //档位改变后波形产生	
-					osDelay(1);
-				} 
+				level -= 1;
+				Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);//波形选择
+				Dac8831_Set_Amp(level, ch1buf);//幅值改变	
+				osDelay(1);			 
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
@@ -704,10 +690,9 @@ void do_work_ctl(uint8_t workMode)
 			}		
 			break;
 		//A通道  +5
-		case 6:
-			
+		case Lcd_Button_to_Level_Up_XWTT_A:		
 			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower <= 250)	
-				gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower+=2;
+				gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower += 2;
 			send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
 																			gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower,
 																			(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60,
@@ -716,10 +701,9 @@ void do_work_ctl(uint8_t workMode)
 			send_ecA_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower);                    
 			break;
 			//A通道  -5
-		case 7:
-			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower >6)
-				gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower-=2;
-			
+		case Lcd_Button_to_Level_Down_XWTT_A:
+			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower > 6)
+				gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower -= 2;			
 			send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
 					gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower,
 					(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60,
@@ -728,9 +712,9 @@ void do_work_ctl(uint8_t workMode)
 			send_ecA_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower);
 			break;
 			//B通道  +5
-		case 8:
+		case Lcd_Button_to_Level_Up_XWTT_B:
 			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower <= 250)		
-				gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower+=2;			
+				gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower += 2;			
 			send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
 					gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower,
 				(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60,
@@ -739,19 +723,18 @@ void do_work_ctl(uint8_t workMode)
 			send_ecB_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
      break;
 		//B通道  -5
-		case 9:
-			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower >6)														
-				gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower-=2;
+		case Lcd_Button_to_Level_Down_XWTT_B:
+			if(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower > 6)														
+				gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower -= 2;
 			send_treatSel_Xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat,
 				gGlobalData.useWorkArg[gGlobalData.current_treatNums].aPower,
 			(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60,
 				gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
 			osDelay(200);
 			send_ecB_xwtt(gGlobalData.useWorkArg[gGlobalData.current_treatNums].bPower);
-
-		 break;
-			default: 
-				break;
+			break;
+		default: 
+			break;
 	}
 	return;
 }

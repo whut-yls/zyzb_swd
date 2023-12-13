@@ -29,19 +29,19 @@ void DAC8831_Set_Data(uint16_t data)
 void DAC8831_Set_Data_Dma(uint16_t *_pbufch1, uint32_t _sizech1,uint32_t _ulFreq)
 {
 	uint32_t i;
-	uint32_t _cmd;
+//	uint32_t _cmd;
 	
-	g_spiLen = 0;
+//	g_spiLen = 0;
 	
-	for(i = 0; i < _sizech1; i++)
-	{
-		/* 更新需要配置PD1和PD0，当前是选择的正常工作模式 */
-		_cmd = (0 << 16) | (_pbufch1[i] << 0);
-		
-		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd >> 8);
-		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd);
+//	for(i = 0; i < _sizech1; i++)
+//	{
+//		/* 更新需要配置PD1和PD0，当前是选择的正常工作模式 */
+//		_cmd = (0 << 16) | (_pbufch1[i] << 0);
+//		
+//		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd >> 8);
+//		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd);
 
-	}	
+//	}	
 #if 1
 	MX_SPI3_Init();
 	
@@ -103,19 +103,6 @@ void DAC8831_Set_Data_Dma(uint16_t *_pbufch1, uint32_t _sizech1,uint32_t _ulFreq
 		
 }
 
-void Dac_level_CTL(uint8_t work_mode)
-{
-	 if(gGlobalData.curWorkMode == 1){
-		 if(work_mode == 0){
-			 HAL_TIM_Base_DeInit(&htim12);  //不产生波形
-		 }
-		 else if(work_mode == 1){
-			DAC8831_Set_Data_Dma(ch1buf,sizeof(ch1buf)/2,gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat);					//定时器开启产生波形
-		 }
-	}
-
-
-}
 
 void Wave_select(uint8_t n, uint16_t *_pBuf)
 {
@@ -175,13 +162,25 @@ void Wave_select(uint8_t n, uint16_t *_pBuf)
 void Dac8831_Set_Amp(float amp, uint16_t *_pBuf)
 {
 	int buf_data;
+	uint32_t _cmd;
 	for(int i = 0; i < 100; ++i)
 	{
 		buf_data = _pBuf[i];
 		buf_data = (buf_data - 32767)*amp / 255 + 32767;
 		_pBuf[i] = (uint16_t)buf_data;
 	}
-	 
+	
+	g_spiLen = 0;
+	
+	for(int i = 0; i < 100; i++)
+	{
+		/* 更新需要配置PD1和PD0，当前是选择的正常工作模式 */
+		_cmd = (0 << 16) | (_pBuf[i] << 0);
+		
+		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd >> 8);
+		g_spiTxBuf[g_spiLen++] = (uint8_t)(_cmd);
+
+	}	 
 }
 
 void DAC8831_SetCS(uint8_t _flag)
