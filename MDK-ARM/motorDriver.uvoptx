@@ -193,62 +193,62 @@
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gADC1_DMA_BUF,0x10</ItemText>
+          <ItemText>cjdata</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gADC3_DMA_BUF</ItemText>
+          <ItemText>cnt_heartbag</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cjdata</ItemText>
+          <ItemText>gSensorData1.RHStatus</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cnt_heartbag</ItemText>
+          <ItemText>gGlobalData.Auto_Level_Ctl</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gSensorData1.RHStatus</ItemText>
+          <ItemText>level</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RecCom2</ItemText>
+          <ItemText>\\motorDriver\../Src/main.c\ch1buf</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RecSen</ItemText>
+          <ItemText>channelTime,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RecCom7</ItemText>
+          <ItemText>countTime,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RecCom7</ItemText>
+          <ItemText>Msgbuf</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RecCom7</ItemText>
+          <ItemText>ret</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gGlobalData.Auto_Level_Ctl</ItemText>
+          <ItemText>twobuf</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>level</ItemText>
+          <ItemText>channelTime,0x10</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
