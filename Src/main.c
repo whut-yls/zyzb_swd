@@ -150,7 +150,7 @@ uint16_t gADC3_DMA_BUF[AD3_NUM*N_NUM];
 uint16_t gADC3_VALUE[AD3_NUM];
 uint16_t gADC3_VALUE_F[AD3_NUM];
 
-
+uint16_t gADC1_Current_FeedBack_BUF[ADC1_CurrentNUM];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -189,7 +189,10 @@ bool Console_TaskSemaphore_Init(void)
 
 /*软件定时器*/
 uint16_t time_ = 1; //ms
-//static uint16_t s_WavePos  = 0;
+
+uint16_t RecRmsl;  							//ADC1采样有效值
+uint16_t RecRmsl_old = 0;  			//ADC1采样有效值做对比
+uint16_t ADC1_ZL_Feedback = 0;	//ADC1治疗采样反馈次数
 //static volatile uint8_t flagAutoLoadTimerRun = 0;
 static void vAutoLoadTimerFunc( TimerHandle_t xTimer );
 
@@ -230,17 +233,29 @@ static void vAutoLoadTimerFunc( TimerHandle_t xTimer )
 		
 	if(cnt_led == 1000)
 		cnt_led = 0;
-	if(cnt_down == 1000)
-	{
+
 		if(gGlobalData.curWorkState == WORK_START)
-		{
-			if((gGlobalData.Alltime != 0 && gGlobalData.curWorkState == WORK_START))
-			{
-				gGlobalData.Alltime = gGlobalData.Alltime - 1;
+		{			
+			if(gGlobalData.curWorkMode == 1){
+				if((RecRmsl - RecRmsl_old) > 20){             																		 //电流超过预设0.1ma开始降档
+					ADC1_ZL_Feedback ++;
+				}
+				if(ADC1_ZL_Feedback >= 500){
+					ADC1_ZL_Feedback = 0;
+					gGlobalData.ZL_Feedback_To_Down_Level = 1;																			//1s内连续超过500次预设值开始降档
+				}				
 			}
+			if(cnt_down == 1000)
+			{		
+				if((gGlobalData.Alltime != 0 && gGlobalData.curWorkState == WORK_START))
+				{
+					gGlobalData.Alltime = gGlobalData.Alltime - 1;
+				}
+				cnt_down = 0;
+				ADC1_ZL_Feedback = 0;
+			}			
 		}
-		cnt_down = 0;
-	}
+
 	
 //处理心跳包   2023.04.07 
 	if(cnt_heartbag > gDeviceParam.heartRate *1000)//到时间 
@@ -291,10 +306,8 @@ int main(void)
 {
 	uint8_t version[5];
   SCB->VTOR = FLASH_BANK1_BASE | 0x80000;
-	gGlobalData.current_time = 0;
-	gGlobalData.current_treatNums = 0;
-	gGlobalData.useWorkArg[0].timeTreat = 0;
-	gGlobalData.useWorkArg[0].waitTime = 0;
+
+
 
   MakeSinTable(ch1buf, 100, 0, 65535);          	//初始化波形
   Dac8831_Set_Amp(10, ch1buf);
@@ -331,7 +344,7 @@ int main(void)
 	
 	/* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
+//  MX_ADC1_Init();
 	MX_ADC3_Init();
 //  MX_ETH_Init();
   MX_I2C2_Init();
@@ -358,10 +371,6 @@ int main(void)
 	//new end
 	Init_All_Parameter(); 
 
-	gDeviceParam.heartRate=15;    //心跳间隔30s
-	gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat=0;
-	gGlobalData.useWorkArg[gGlobalData.current_treatNums].level=0;
-	gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat=0;    										//初始化频率档位治疗时长值
 	__enable_irq();
   /* USER CODE BEGIN 2 */
 	MX_LWIP_Init();
@@ -665,7 +674,7 @@ void MPU_Config(void)
   * @param None
   * @retval None
   */
-static void MX_ADC1_Init(void)
+void MX_ADC1_Init(uint32_t _ulFreq)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
@@ -681,21 +690,21 @@ static void MX_ADC1_Init(void)
   /** Common config
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV64;
-  hadc1.Init.Resolution = ADC_RESOLUTION_16B;
-  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;//ADC_SCAN_DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;//ADC_EOC_SINGLE_CONV;
-  hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_ONESHOT;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV12;   	// 240M/12=20M  240M/64=3.75M
+  hadc1.Init.Resolution = ADC_RESOLUTION_16B;						//16位分辨率 
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;						//禁止扫描，因为仅开了一个通道 			ADC_SCAN_DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;				//EOC转换结束标志										ADC_EOC_SEQ_CONV;  
+  hadc1.Init.LowPowerAutoWait = DISABLE;								//禁止低功耗自动延迟特性
+  hadc1.Init.ContinuousConvMode = DISABLE;   						//禁止自动转换，采用的软件触发      ENABLE
+  hadc1.Init.NbrOfConversion = 1;												//使用了1个转换通道 	
+  hadc1.Init.DiscontinuousConvMode = DISABLE;						//禁止不连续模式
+  hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T1_CC1;   // ADC_SOFTWARE_START
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;			 	//ADC_EXTERNALTRIGCONVEDGE_NONE
+  hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR;  	//DMA循环模式接收ADC转换的数据 ADC_CONVERSIONDATA_DMA_ONESHOT
   hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   hadc1.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
-  hadc1.Init.OversamplingMode = DISABLE;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  hadc1.Init.OversamplingMode = DISABLE;								//过采样模式关闭
+	if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -706,11 +715,16 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Regular Channel
+ 	/* 校准ADC，采用偏移校准 */
+	if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)   //ADD
+	{
+		Error_Handler();
+	}	
+	/** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Channel = ADC_CHANNEL_6;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_16CYCLES_5 ;
+  sConfig.SamplingTime = ADC_SAMPLETIME_64CYCLES_5 ;   //ADC_SAMPLETIME_16CYCLES_5
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -720,7 +734,13 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-
+	MX_TIM1_Init(_ulFreq);
+  
+	/* ## - 6 - 启动ADC的DMA方式传输 ####################################### */
+	if (HAL_ADC_Start_DMA(&hadc1,(uint32_t *)gADC1_Current_FeedBack_BUF,ADC1_CurrentNUM) != HAL_OK)
+	{
+		Error_Handler();
+	}
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -1709,10 +1729,6 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN 5 */
 	int16_t CountDown_Time = 0;
 	/*ADC校准**/
-	if(HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED)!=HAL_OK)
-	{
-		Error_Handler();
-	}
 	
 	if(HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED)!=HAL_OK)
 	{
@@ -1721,7 +1737,6 @@ void StartDefaultTask(void const * argument)
 	osDelay(10);	
 	
 	/*开始DMA接收ADC，DMA满产生中断*/
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)gADC1_DMA_BUF,N_NUM* AD1_NUM);
 	HAL_ADC_Start_DMA(&hadc3, (uint32_t *)gADC3_DMA_BUF,N_NUM* AD3_NUM);
 	
 	/*获取内部参考电压*/
@@ -1758,12 +1773,15 @@ void StartDefaultTask(void const * argument)
 					Wave_select(gGlobalData.useWorkArg[0].waveTreat, ch1buf);//波形选择
 					Dac8831_Set_Amp(gGlobalData.useWorkArg[0].level, ch1buf);//幅值改变
 					DAC8831_Set_Data_Dma(ch1buf,sizeof(ch1buf)/2,gGlobalData.useWorkArg[0].freqTreat);					//定时器开启产生波形				
-					osDelay(100);
+					osDelay(500);
+					MX_ADC1_Init(gGlobalData.useWorkArg[0].freqTreat);                                          //开启adc1反馈采样					osDelay(100);
 					send_LcdOutStatus(1);                                    //理疗绿灯 理疗结束红灯
 					osDelay(100);
 					if(level <= 60)
 					//	Send_LcdVoltage(5.513*level);	//发送显示电压 适用于高功率版本
 							Send_LcdVoltage(5.84f*level);	
+					osDelay(500);
+					RecRmsl_old = Gets_Rmsl_update(RecRmsl);
 				}
 				else																											 //穴位疼痛理疗
 				{
@@ -1821,6 +1839,7 @@ void StartDefaultTask(void const * argument)
 								{
 									level=0;//设置成默认档位为1 2023.04.04 kardos
 									HAL_TIM_Base_DeInit(&htim12);   //不产生波形
+									HAL_TIM_Base_DeInit(&htim1);
 									send_LcdWorkStatus(6);																					//修改设备工作状态为：穴位理疗完成
 									gGlobalData.curWorkMode=WORK_MODE_WT;
 									gGlobalData.oldWorkMode=gGlobalData.curWorkMode;
@@ -2262,14 +2281,12 @@ void Console_Task(void const * pvParameters)
 						//SWD  +5
 						case 0x0b:
 							do_work_ctl(Lcd_Button_to_Level_Up_SWD);
-							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;																						//发送心跳清空心跳计数器
 							gGlobalData.heartbag_flage = 1;                             
 							break;
 						//SWD  -5
 						case 0x0c:
 							do_work_ctl(Lcd_Button_to_Level_Down_SWD);
-							osDelay(500);//延时 防止点击过快
 							cnt_heartbag = 0;															//发送心跳清空心跳计数器
 							gGlobalData.heartbag_flage = 1;                            
 							break;
@@ -2344,16 +2361,7 @@ void Console_Task(void const * pvParameters)
 }
 bool Get_ADC1_Hex(void)	
 {
-	//static uint16_t pt[AD1_NUM*10];
-	int i,j ;
-	uint16_t temp[N_NUM];
-	for(i=0;i<AD1_NUM;i++)
-	{
-		for(j=0;j<N_NUM;j++) {temp[j] =  gADC1_DMA_BUF[j*AD1_NUM+i];}
-		gGlobalData.currentNet=Gets_Average(temp,N_NUM);	
-		*(gADC1_VALUE+i) = Gets_Average(temp,N_NUM);	
-		*(gADC1_VALUE_F+i) = ((*(gADC1_VALUE+i))*gREFVOL_VAL)/65535;   //gREFVOL_VAL
-	}
+	RecRmsl=Gets_Rmsl(gADC1_Current_FeedBack_BUF,ADC1_CurrentNUM );
 	return true;
 }
 

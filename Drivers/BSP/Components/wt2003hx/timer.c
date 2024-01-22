@@ -27,6 +27,7 @@
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim12;
+TIM_HandleTypeDef  htim1 ={0};
 TIM_MasterConfigTypeDef sMasterConfig = {0};
 TIM_OC_InitTypeDef sConfig = {0};
 
@@ -112,6 +113,60 @@ void MX_TIM12_Init(uint32_t _ulFreq)
 #endif
 }
 
+
+void MX_TIM1_Init(uint32_t _ulFreq)    //240M
+{
+	uint16_t usPeriod;
+	uint16_t usPrescaler;	
+
+	/* 使能时钟 */  
+	__HAL_RCC_TIM1_CLK_ENABLE();	
+
+	if(_ulFreq <= 20){
+		usPeriod           = 2399;    //1KHZ 
+		usPrescaler        = 100-1;			
+	}	
+	else if(_ulFreq <= 50){
+		usPeriod           = 2399;    //5KHZ 
+		usPrescaler        = 20-1;			
+	}
+	else if(_ulFreq <= 1000){
+		usPeriod           = 1199;    //10KHZ 
+		usPrescaler        = 20-1;				
+	}
+	else if(_ulFreq <= 2000){
+		usPeriod           = 1199;    //20KHZ 
+		usPrescaler        = 10-1;			
+	}
+	else if(_ulFreq <= 10000){
+		usPeriod           = 1199;    //50KHZ 
+		usPrescaler        = 4-1;			
+	}	
+	htim1.Instance = TIM1; 
+	htim1.Init.Period            = usPeriod;    
+	htim1.Init.Prescaler         = usPrescaler;
+	htim1.Init.ClockDivision     = 0;
+	htim1.Init.CounterMode       = TIM_COUNTERMODE_UP;
+	htim1.Init.RepetitionCounter = 0;
+	HAL_TIM_Base_Init(&htim1);	
+
+	sConfig.OCMode     = TIM_OCMODE_PWM1;
+	sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+
+	/* 占空比50% */
+	sConfig.Pulse = 1000;  
+	if(HAL_TIM_OC_ConfigChannel(&htim1, &sConfig, TIM_CHANNEL_1) != HAL_OK)
+	{
+		Error_Handler( );
+	}
+
+	/* 启动OC1 */
+	if(HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_1) != HAL_OK)
+	{
+	Error_Handler( );
+	}	
+	
+}
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
@@ -119,14 +174,17 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
   {
 
     __HAL_RCC_TIM12_CLK_ENABLE();
-
- 
-		
 		
     HAL_NVIC_SetPriority(TIM8_BRK_TIM12_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(TIM8_BRK_TIM12_IRQn);
-
   }
+  else if(tim_baseHandle->Instance==TIM1)
+  {
+
+		__HAL_RCC_TIM1_CLK_ENABLE();
+
+
+  }		
 }
 
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
@@ -139,7 +197,14 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
     HAL_NVIC_DisableIRQ(TIM8_BRK_TIM12_IRQn);
 
-  }
+  }	
+  else if(tim_baseHandle->Instance==TIM1)
+  {
+
+		__HAL_RCC_TIM1_CLK_DISABLE();
+		
+
+  }		
 }
 
 /* USER CODE BEGIN 1 */

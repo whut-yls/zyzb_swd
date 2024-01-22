@@ -112,7 +112,11 @@ void startLoopTask(void const * argument)
 					break;
 			
 			}
-
+			if(gGlobalData.ZL_Feedback_To_Down_Level == 1){			
+				do_work_ctl(Lcd_Button_to_Level_Down_SWD);
+				gGlobalData.ZL_Feedback_To_Down_Level = 0;
+				printf("\r\n***********电流开始变大***电流值为：%d(ua)***********\r\n***********预设电流值为：%d(ua)***********\r\n",RecRmsl*5,RecRmsl_old*5);
+			}		
 		} 
 #if 0            //温湿度传感器和采集子板地址冲突先给屏蔽		
 		/*温度湿度采集*/
@@ -215,7 +219,10 @@ void startLoopTask(void const * argument)
 		if(pingCnt>=20)
 		{
 			pingCnt=0;
-			gGlobalData.Send_Ping_Task=true;
+			if(gGlobalData.netKind == 3)
+				gGlobalData.Send_Ping_Task=true;
+			if(gGlobalData.curWorkMode == WORK_MODE_ZL && gGlobalData.curWorkState == WORK_START)
+				printf("\r\n当前治疗电流值为：%d(ua)\r\n",RecRmsl*5);
 		}
 		
 		SensorCnt1++;

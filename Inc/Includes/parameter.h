@@ -182,6 +182,7 @@
 #define	KEY_HARD_VER	"hardwareVersion"	//硬件版本
 #define KEY_HEART_FLAG "flag"      //设备标识
 #define KEY__WORK_CURRENT "electricity"    //主板总电流
+#define KEY__ZL_CURRENT "ZLcurrent"    //过人体反馈电流
 
 //采集方案相关
 #define KEY_DATA_UPTIME  "interval" 		//数据上传间隔
@@ -421,7 +422,7 @@ uint8_t			conFlage;//当前是那种通信正在连接，1-rj45 2-wifi  3-4g
 	
 	uint16_t current_treatNums;			  //当前治疗方案号
 	uint16_t Alltime;			  	 				//屏幕倒计时 时长
-	uint16_t current_time;		 				//当前治疗方案剩余时长
+	uint16_t ZL_Feedback_To_Down_Level;        //控制减档操作
 
 	uint8_t ResetDevidcnt;
 	

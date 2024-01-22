@@ -5,7 +5,7 @@
 <h2>Tool Versions:</h2>
 IDE-Version: ��Vision V5.30.0.0
 Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: 1 2590201681@qq.com, 1, LIC=QF82M-XLXX1-FW92N-Y7BEH-LY2SK-62VBX
+License Information: 1 1, 1, LIC=PE7DL-0343N-63NMB-2HVV3-VPY1L-8QZC3
  
 Tool Versions:
 Toolchain:       MDK-ARM Plus  Version: 5.30.0.0
@@ -27,23 +27,29 @@ Project File Date:  08/20/2023
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'f:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'motorDriver'
-compiling parameter.c...
-..\Src\App\parameter.c(97): warning:  #186-D: pointless comparison of unsigned integer with zero
-  			if(gDeviceParam.workArg[i].level>Level_MAX || gDeviceParam.workArg[i].upTime<Level_MIN)
-..\Src\App\parameter.c(142): warning:  #186-D: pointless comparison of unsigned integer with zero
-  		if(gDeviceParam.heartRate>HeartRate_MAX||gDeviceParam.heartRate<HeartRate_MIN)
-..\Src\App\parameter.c: 2 warnings, 0 errors
+compiling com.c...
+compiling stm32h7xx_it.c...
+compiling startLoopTask.c...
+..\Src\App\startLoopTask.c(118): warning:  #870-D: invalid multibyte character sequence
+  				printf("\r\n***********电流开始变�?***电流值为�?%d(ua)***********\r\n***********预设电流值为�?%d(ua)***********\r\n",RecRmsl*5,RecRmsl_old*5);
+..\Src\App\startLoopTask.c(118): warning:  #870-D: invalid multibyte character sequence
+  				printf("\r\n***********电流开始变�?***电流值为�?%d(ua)***********\r\n***********预设电流值为�?%d(ua)***********\r\n",RecRmsl*5,RecRmsl_old*5);
+..\Src\App\startLoopTask.c(118): warning:  #870-D: invalid multibyte character sequence
+  				printf("\r\n***********电流开始变�?***电流值为�?%d(ua)***********\r\n***********预设电流值为�?%d(ua)***********\r\n",RecRmsl*5,RecRmsl_old*5);
+..\Src\App\startLoopTask.c(225): warning:  #870-D: invalid multibyte character sequence
+  				printf("\r\n当前治疗电流值为�?%d(ua)\r\n",RecRmsl*5);
+..\Src\App\startLoopTask.c: 4 warnings, 0 errors
 compiling main.c...
-../Src/main.c(2196): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *restrict"
+../Src/main.c(2215): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *restrict"
   						char *token = strtok(buf1, ".");
-../Src/main.c(2215): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "const char *"
+../Src/main.c(2234): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "const char *"
   						gDeviceParam.mqArg.mqttPort=atoi(buf2);				
 ../Src/main.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=159372 RO-data=2184 RW-data=1160 ZI-data=318856  
+Program Size: Code=160248 RO-data=2308 RW-data=1172 ZI-data=319516  
 FromELF: creating hex file...
 After Build - User command #1: fromelf --bin -o ".\bin_file\motorDriver.bin" "F:\Working\��ҽ\��ҽװ������8-20�����\2023-12-9-SWD&XWTT\MDK-ARM\motorDriver\motorDriver.axf"
-".\motorDriver\motorDriver.axf" - 0 Error(s), 4 Warning(s).
+".\motorDriver\motorDriver.axf" - 0 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,13 +66,13 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_motorDriver
-  C:\Users\25902\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
-  C:\Users\25902\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.0\Drivers\CMSIS\Device\ST\STM32H7xx\Include
+  C:\Users\Yls\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\Yls\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.0\Drivers\CMSIS\Device\ST\STM32H7xx\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-Build Time Elapsed:  00:00:07
+Build Time Elapsed:  00:00:10
 </pre>
 </body>
 </html>

@@ -166,7 +166,7 @@ extern bool gMqttLinkStatus;
 
 /* USER CODE BEGIN Private defines */
 void MX_GPIO_Init(void);
-void MX_ADC1_Init(void);
+void MX_ADC1_Init(uint32_t _ulFreq);
 void MX_ADC3_Init(void);
 void MX_ETH_Init(void);
 void MX_I2C2_Init(void);
@@ -283,6 +283,11 @@ extern osThreadId mqttClientTaskHandle;
 extern osThreadId ethernetTaskTaskHandle;
 extern osThreadId mqttSendTaskHandle;
 extern osThreadId sendheartTaskHandle;
+
+
+extern uint16_t RecRmsl;  //ADC1采样治疗反馈
+extern uint16_t RecRmsl_old;  //ADC1采样治疗反馈
+
 
 extern osThreadId wifiClientTaskHandle;
 extern osThreadId ec200sClientTaskHandle;

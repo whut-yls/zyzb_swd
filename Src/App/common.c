@@ -660,6 +660,7 @@ void do_work_ctl(uint8_t workMode)
 			level=0;//复位时 给0  2023.04.04 kardos
 			gGlobalData.Auto_Level_Ctl = 0;  
 			HAL_TIM_Base_DeInit(&htim12);   //不产生波形
+			HAL_TIM_Base_DeInit(&htim1);
 			break;
 		case Lcd_Button_to_Level_Up_SWD:     //swd档位加
 			if(level <= 60)
@@ -671,8 +672,10 @@ void do_work_ctl(uint8_t workMode)
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 							level,
 							(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-				osDelay(100);
-				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子		
+				osDelay(500);
+				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子	
+				if(gGlobalData.ZL_Feedback_To_Down_Level == 0)
+					RecRmsl_old = Gets_Rmsl_update(RecRmsl);               //获取最新反馈值，人为加减档时重新赋值				
 			}	
 			break;						
 		case Lcd_Button_to_Level_Down_SWD:    //SWD档位减
@@ -685,8 +688,10 @@ void do_work_ctl(uint8_t workMode)
 				send_treatSel(gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat,
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
-				osDelay(100);
+				osDelay(500);
 				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子			
+				if(gGlobalData.ZL_Feedback_To_Down_Level == 0)
+					RecRmsl_old = Gets_Rmsl_update(RecRmsl);               //获取最新反馈值，人为加减档时重新赋值
 			}		
 			break;
 		//A通道  +5
@@ -760,6 +765,25 @@ uint16_t Gets_Average(uint16_t *pt,int l)
 		return (uint16_t)(sum/nums);
 }
 
+
+uint16_t Gets_Rmsl(uint16_t *pt,int l)         //计算有效值
+{
+	int16_t Rec_RmsTemp = 0;
+	static uint32_t sum = 0;
+	static uint16_t rms = 0;
+	
+	for(uint16_t i = 0 ; i < l ;i++){
+		Rec_RmsTemp = *(pt+i)*3300/65535-1650;   
+		sum += Rec_RmsTemp * Rec_RmsTemp;
+	}	
+	rms = (uint16_t)sqrt(sum/l);
+	sum=0;
+	return rms;
+}
+uint16_t Gets_Rmsl_update(uint16_t data){
+	return data;
+}
+
 //hyadd
 void general_heartBag(int fun, int status, int netKind, int workState, int timeLast)
 {
@@ -782,6 +806,7 @@ void general_heartBag(int fun, int status, int netKind, int workState, int timeL
 	cJSON_AddNumberToObject(item_work ,KEY_WORK_STATE, workState);
 	cJSON_AddNumberToObject(item_work ,KEY__WORK_TIME_LAST, timeLast);
 	cJSON_AddNumberToObject(item_work ,KEY__WORK_CURRENT, gGlobalData.currentNet);
+	cJSON_AddNumberToObject(item_work ,KEY__ZL_CURRENT,RecRmsl*5);      //治疗人体流过的电流有效值 单位ua  2024/1/22
 	
 	item_env = cJSON_AddObjectToObject(root,KEY_ENV);
 	cJSON_AddNumberToObject(item_env ,KEY_TEMP, (int) (gSensorData1.RHt*100+0.5f)/100.0);

@@ -32,7 +32,7 @@ extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim7;
 extern TIM_HandleTypeDef htim13;
 
-void MX_TIM1_Init(void);
+void MX_TIM1_Init(uint32_t _ulFreq);
 void MX_TIM4_Init(void);	
 void MX_TIM7_Init(void);
 void MX_TIM13_Init(void);

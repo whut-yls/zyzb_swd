@@ -25,7 +25,10 @@
 #define AD1_NUM			  		1
 #define AD3_NUM			  		1
 //#define	AD_ALL_NUM				AD1_NUM			//AD1_NUM+..
-	 
+#define ADC1_CurrentNUM  300
+
+extern uint16_t gADC1_Current_FeedBack_BUF[ADC1_CurrentNUM];
+
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 
@@ -42,7 +45,7 @@ extern uint16_t gADC3_VALUE_F[AD3_NUM];
 
 
 /**interface function**/	 
-void MX_ADC1_Init(void);
+void MX_ADC1_Init(uint32_t _ulFreq);
 void MX_ADC3_Init(void);
 /**public function**/	 
 bool Get_ADC1(float * buff);

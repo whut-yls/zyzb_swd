@@ -52,8 +52,16 @@ int Init_All_Parameter(void)
 			gGlobalData.useWorkArg[i].outs[j]=gDeviceParam.workArg[i].outs[j];
 		}
 	}
-	
+	gGlobalData.current_treatNums = 0;
+	gGlobalData.useWorkArg[0].timeTreat = 0;
+	gGlobalData.useWorkArg[0].waitTime = 0;	
 
+	gDeviceParam.heartRate=15;    //心跳间隔30s
+	gGlobalData.useWorkArg[gGlobalData.current_treatNums].freqTreat=0;
+	gGlobalData.useWorkArg[gGlobalData.current_treatNums].level=0;
+	gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat=0;    										//初始化频率档位治疗时长值
+	
+	
 	gGlobalData.rj45Status=false;
 	gGlobalData.wifiStatus=false;
 	gGlobalData.yd4gStatus=false;
