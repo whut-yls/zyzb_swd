@@ -285,17 +285,12 @@ static void vAutoLoadTimerFunc( TimerHandle_t xTimer )
 				gGlobalData.Wifi_set = true;					
 			}
 		 gGlobalData.heart_count = 0;//超时计数器置为0 重新开始计数
-	}
-
-
-	
-	
+	}	
 }
 
 unsigned portBASE_TYPE defaultTask_stack;
 
 unsigned portBASE_TYPE Console_Task_stack;
-
 
 /**
   * @brief  The application entry point.
@@ -306,9 +301,6 @@ int main(void)
 {
 	uint8_t version[5];
   SCB->VTOR = FLASH_BANK1_BASE | 0x80000;
-
-
-
   MakeSinTable(ch1buf, 100, 0, 65535);          	//初始化波形
   Dac8831_Set_Amp(10, ch1buf);
 
@@ -344,8 +336,8 @@ int main(void)
 	
 	/* Initialize all configured peripherals */
   MX_GPIO_Init();
-//  MX_ADC1_Init();
-	MX_ADC3_Init();
+//  MX_ADC1_Init(500);
+//	MX_ADC3_Init();
 //  MX_ETH_Init();
   MX_I2C2_Init();
   MX_SPI5_Init();
@@ -704,6 +696,10 @@ void MX_ADC1_Init(uint32_t _ulFreq)
   hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   hadc1.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc1.Init.OversamplingMode = DISABLE;								//过采样模式关闭
+	if (HAL_ADC_DeInit(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
 	if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -780,6 +776,10 @@ static void MX_ADC3_Init(void)
   hadc3.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   hadc3.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc3.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_DeInit(&hadc3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_ADC_Init(&hadc3) != HAL_OK)
   {
     Error_Handler();
@@ -1724,20 +1724,20 @@ void MX_GPIO_Init(void)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-		uint8_t gbk0[8]={0,};
+	uint8_t gbk0[8]={0,},collectTime = 0;
 	uint8_t gbkNum0[13]={0,};
   /* USER CODE BEGIN 5 */
 	int16_t CountDown_Time = 0;
 	/*ADC校准**/
 	
-	if(HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED)!=HAL_OK)
-	{
-		Error_Handler();
-	}
+//	if(HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED)!=HAL_OK)
+//	{
+//		Error_Handler();
+//	}
 	osDelay(10);	
 	
 	/*开始DMA接收ADC，DMA满产生中断*/
-	HAL_ADC_Start_DMA(&hadc3, (uint32_t *)gADC3_DMA_BUF,N_NUM* AD3_NUM);
+//	HAL_ADC_Start_DMA(&hadc3, (uint32_t *)gADC3_DMA_BUF,N_NUM* AD3_NUM);
 	
 	/*获取内部参考电压*/
 	osDelay(50);	
@@ -1752,6 +1752,12 @@ void StartDefaultTask(void const * argument)
   {
 //		defaultTask_stack=uxTaskGetStackHighWaterMark(defaultTaskHandle);
 		osDelay(10);
+//		collectTime++;
+//		if(collectTime>=1)	//每10ms更新一次
+//		{			
+//			collectTime=0;
+//			HAL_ADC_Start_DMA(&hadc3, (uint32_t *)gADC3_DMA_BUF,N_NUM* AD3_NUM);//直流采样
+//		}		
 		if(gDeviceParam.devLock==true)
 		{
 			continue;

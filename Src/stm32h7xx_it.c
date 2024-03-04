@@ -251,9 +251,9 @@ void DMA1_Stream4_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Stream4_IRQn 0 */
 
   /* USER CODE END DMA1_Stream4_IRQn 0 */
-	if((DMA1->HISR & DMA_FLAG_TCIF0_4) != RESET)      																					//传输完成
+ 	if((DMA1->HISR & DMA_FLAG_TCIF0_4) != RESET)      																					//传输完成
 	{
-		if(gGlobalData.curWorkMode == WORK_MODE_ZL && gGlobalData.curWorkState == WORK_START)	
+		if(gGlobalData.curWorkMode == 1 && gGlobalData.curWorkState == WORK_START)	
 			Get_ADC1_Hex();
 		DMA1->HIFCR = DMA_FLAG_TCIF0_4;
 	}
