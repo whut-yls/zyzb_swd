@@ -115,7 +115,7 @@ void startLoopTask(void const * argument)
 			if(gGlobalData.ZL_Feedback_To_Down_Level == 1){			
 				do_work_ctl(Lcd_Button_to_Level_Down_SWD);
 				gGlobalData.ZL_Feedback_To_Down_Level = 0;
-				printf("\r\n***********The current is increasing***current value：%d(ua)***********\r\n***********Preset current value is：%d(ua)***********\r\n",RecRmsl*5,RecRmsl_old*5);
+				printf("\r\n****The current is increasing:%d(ua)****Current Valude:%d(ua)\r\n",RecRmsl*5,RecRmsl_old*5);
 			}		
 		} 
 #if 0            //温湿度传感器和采集子板地址冲突先给屏蔽		

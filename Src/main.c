@@ -1724,7 +1724,7 @@ void MX_GPIO_Init(void)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-	uint8_t gbk0[8]={0,},collectTime = 0;
+	uint8_t gbk0[8]={0,}; 
 	uint8_t gbkNum0[13]={0,};
   /* USER CODE BEGIN 5 */
 	int16_t CountDown_Time = 0;
@@ -1752,12 +1752,6 @@ void StartDefaultTask(void const * argument)
   {
 //		defaultTask_stack=uxTaskGetStackHighWaterMark(defaultTaskHandle);
 		osDelay(10);
-//		collectTime++;
-//		if(collectTime>=1)	//每10ms更新一次
-//		{			
-//			collectTime=0;
-//			HAL_ADC_Start_DMA(&hadc3, (uint32_t *)gADC3_DMA_BUF,N_NUM* AD3_NUM);//直流采样
-//		}		
 		if(gDeviceParam.devLock==true)
 		{
 			continue;
@@ -1785,7 +1779,7 @@ void StartDefaultTask(void const * argument)
 					osDelay(100);
 					if(level <= 60)
 					//	Send_LcdVoltage(5.513*level);	//发送显示电压 适用于高功率版本
-							Send_LcdVoltage(5.84f*level);	
+							Send_LcdVoltage(4.20f*level);	
 					osDelay(500);
 					RecRmsl_old = Gets_Rmsl_update(RecRmsl);
 				}
@@ -1895,7 +1889,7 @@ void StartDefaultTask(void const * argument)
 									Wave_select(gGlobalData.useWorkArg[gGlobalData.current_treatNums].waveTreat, ch1buf);
 									Dac8831_Set_Amp(level, ch1buf);  					
 //								Send_LcdVoltage(5.513*level);	//适用于高功率版本
-									Send_LcdVoltage(5.84f*level);	//适用于低功率版本
+									Send_LcdVoltage(4.20f*level);	//适用于低功率版本
 									osDelay(200);	
 									channelTime=0;
 								}

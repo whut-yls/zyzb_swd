@@ -579,10 +579,10 @@ void do_work_ctl(uint8_t workMode)
 					set_sampleMode(MODE_ZL);
 					if(level <= 60)
 					{
-						Send_LcdVoltage(3.125f*level);									//适用于低功率放大板子
+						Send_LcdVoltage(4.20f*level);									//适用于低功率放大板子   3.125
 					}
 					else 
-						Send_LcdVoltage(3.125*60);	
+						Send_LcdVoltage(4.20*60);	
 				}
 				else if(gGlobalData.curWorkMode == 2){															//疼痛理疗 		//2023.02.21 kardos
 					send_startORstop_xwtt(1);																				//启动指令
@@ -673,7 +673,7 @@ void do_work_ctl(uint8_t workMode)
 							level,
 							(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 				osDelay(500);
-				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子	
+				Send_LcdVoltage(4.20f*level);//适用于低功率放大板子	
 				if(gGlobalData.ZL_Feedback_To_Down_Level == 0)
 					RecRmsl_old = Gets_Rmsl_update(RecRmsl);               //获取最新反馈值，人为加减档时重新赋值				
 			}	
@@ -689,7 +689,7 @@ void do_work_ctl(uint8_t workMode)
 											level,
 											(gGlobalData.useWorkArg[gGlobalData.current_treatNums].timeTreat)/60);
 				osDelay(500);
-				Send_LcdVoltage(5.84f*level);//适用于低功率放大板子			
+				Send_LcdVoltage(4.20f*level);//适用于低功率放大板子			
 				if(gGlobalData.ZL_Feedback_To_Down_Level == 0)
 					RecRmsl_old = Gets_Rmsl_update(RecRmsl);               //获取最新反馈值，人为加减档时重新赋值
 			}		
